@@ -1,15 +1,18 @@
 # WebCon Arena
-Projekt bota dla WebCon Arena.
-------------------------------
+## Projekt bota dla WebCon Arena.
 
+---------------------------------
 
 ## Bot grający w TRON.
-* Eternal
+### Eternal
 
+=================================
 
 ### Twórca bota:
 * Dominik Janiec
 * dominikjaniec@gmail.com
+
+---------------------------------
 
 ### Terminy:
 * Sparingi: 1 VII 2013r.
