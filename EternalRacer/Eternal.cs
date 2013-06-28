@@ -6,7 +6,7 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.0.1",
+        Version = "0.0.0.2",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
