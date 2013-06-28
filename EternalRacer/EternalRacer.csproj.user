@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>E:\GitHub\WebConArena\webcon_arena\arena.exe</StartProgram>
-    <StartWorkingDirectory>E:\GitHub\WebConArena\webcon_arena\</StartWorkingDirectory>
+    <StartProgram>E:\BitBucket\WebConArena\webcon_arena\arena.exe</StartProgram>
+    <StartWorkingDirectory>E:\BitBucket\WebConArena\webcon_arena\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>
