@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EternalRacer", "EternalRacer\EternalRacer.csproj", "{396C988A-7D42-478F-BDB3-199D61ECC37F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EternalTester", "EternalTester\EternalTester.csproj", "{FA7B9122-FC18-4023-90B0-48F8DF2704B4}"
+EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "arena", "webcon_arena\arena.exe", "{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = E:\GitHub\WebConArena\webcon_arena\arena.exe
+		RemoteMachine = CLEANGREEN
+		StartingDirectory = E:\GitHub\WebConArena\webcon_arena
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		LaunchSQLEngine = No
+		AttachLaunchAction = Yes
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{396C988A-7D42-478F-BDB3-199D61ECC37F}.Release|x86.ActiveCfg = Release|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FA7B9122-FC18-4023-90B0-48F8DF2704B4}.Release|x86.ActiveCfg = Release|Any CPU
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Debug|x86.ActiveCfg = Debug|x86
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Release|Any CPU.ActiveCfg = Debug|x86
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Release|Mixed Platforms.ActiveCfg = Debug|x86
+		{BFA30CF1-1221-4B9C-87D3-B063A6898CFD}.Release|x86.ActiveCfg = Debug|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
