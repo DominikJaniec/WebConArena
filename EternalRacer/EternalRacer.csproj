@@ -46,7 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Eternal.cs" />
+    <Compile Include="MapaGry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StanyPola.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="arena.exe.config" />
