@@ -1,5 +1,4 @@
-﻿
-namespace EternalRacer
+﻿namespace EternalRacer.Enums
 {
     internal enum StanyPola
     {

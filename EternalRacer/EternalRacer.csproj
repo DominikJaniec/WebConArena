@@ -45,10 +45,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\Kierunki.cs" />
+    <Compile Include="Enums\Interakcja.cs" />
+    <Compile Include="Enums\Skrecanie.cs" />
     <Compile Include="Eternal.cs" />
+    <Compile Include="Extensions\MoveExtensions.cs" />
     <Compile Include="MapaGry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StanyPola.cs" />
+    <Compile Include="Enums\StanyPola.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="arena.exe.config" />
