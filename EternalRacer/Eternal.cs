@@ -1,5 +1,6 @@
-﻿using EternalRacer.Enums;
-using EternalRacer.Extensions;
+﻿using EternalRacer.Strategie;
+using EternalRacer.Strategie.Przetrwanie;
+using EternalRacer.Strategie.Zniszczenie;
 using System;
 using System.AddIn;
 using System.Collections.Generic;
@@ -9,125 +10,66 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.0.3",
+        Version = "0.0.1.2",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
     {
-        private Interakcja mozliwoscInterakcji;
-        private bool pierwszyRuch = true;
-
-        private Move mojOstatniRuch;
-        //private Move jegoOstatniRuch;
-
-        private Point mojaOstatniaPozycja;
-
-        private MapaGry mapaGry;
-
-        private List<Kierunki> dozwoloneKierunki;
-
+        #region Metoda z IRacer
 
         public Move GetMove(Point myPosition, Point opponentPosition, List<MapPoint> map)
         {
-            if (pierwszyRuch == false)
-            {
-                mapaGry.Aktualizuj(myPosition, opponentPosition);
-                dozwoloneKierunki = mapaGry.OkreslDozwoloneKierunki(myPosition);
+            return ImplementacjaGetMove(myPosition, opponentPosition, map);
+        }
 
-                switch (mozliwoscInterakcji)
+        #endregion
+
+        #region Publiczne Własności
+
+        public MapaGry Mapa { get; private set; }
+
+        internal AStrategia Strategia { get; set; }
+        public RodzajeStrategii BiezacaStrategia { get; internal set; }
+
+        #endregion
+
+        #region Konstruktor
+
+        public Eternal()
+        {
+            ImplementacjaGetMove = new Func<Point, Point, List<MapPoint>, Move>((mojaStartowa, jegoStartowa, mapaGry) =>
+            {
+                ImplementacjaGetMove = (mojaPozycja, jegoPozycja, mapa_zbedna) =>
                 {
-                    case Interakcja.Odcieci:
-                        mojOstatniRuch = WypelniajPrzestrzen();
-                        break;
-                    case Interakcja.Walczacy:
-                    default:
-                        throw new NotImplementedException();
-                }
+                    return Strategia.WykonajRuch(mojaPozycja, jegoPozycja);
+                };
 
-                mojaOstatniaPozycja = myPosition;
-                return mojOstatniRuch;
-            }
-            else
-            {
-                PrzygotujSie(map);
-                mojOstatniRuch = UstalPierwszyRuch(myPosition, opponentPosition);
+                int szerokosc = mapaGry.Max(mp => mp.Point.X) + 1;
+                int wysokosc = mapaGry.Max(mp => mp.Point.Y) + 1;
+                Mapa = new MapaGry(szerokosc, wysokosc);
 
-                //TODO 1:
-                // Wymuszamy przypadek braku niebezpieczeństwa interakcji.
-                mozliwoscInterakcji = Interakcja.Odcieci;
-                mojaOstatniaPozycja = myPosition;
+                StrategiaZniszczenia strategiaZniszczenia = new StrategiaZniszczenia(Mapa, mojaStartowa, jegoStartowa);
+                strategiaZniszczenia.GraczeNieOsiagalni += OnGraczeNieOsiagalni;
+                Strategia = strategiaZniszczenia;
 
-                mapaGry.Aktualizuj(myPosition, opponentPosition);
-                return mojOstatniRuch;
-            }            
+                return ImplementacjaGetMove(mojaStartowa, jegoStartowa, mapaGry);
+            });
         }
 
-        private Move UstalPierwszyRuch(Point myPosition, Point opponentPosition)
+        #endregion
+
+        #region Prywatne
+
+        private Func<Point, Point, List<MapPoint>, Move> ImplementacjaGetMove;
+
+        private void OnGraczeNieOsiagalni(object sender, EventArgs e)
         {
-            //TODO: Poprawa wybierania pierwszego kierunku:
-            if (myPosition.X == mapaGry.Min.X &&       // X O O
-                myPosition.Y == mapaGry.Min.Y)         // O O O
-            {                                          // O O O
-                return Move.Down;
-            }
-            else if (myPosition.X == mapaGry.Min.X &&  // O O O
-                     myPosition.Y == mapaGry.Max.Y)    // O O O
-            {                                          // X O O
-                return Move.Right;
-            }
-            else if (myPosition.X == mapaGry.Max.X &&  // O O O
-                     myPosition.Y == mapaGry.Max.Y)    // O O O
-            {                                          // O O X
-                return Move.Up;
-            }
-            else if (myPosition.X == mapaGry.Max.X &&  // O O X
-                     myPosition.Y == mapaGry.Min.Y)    // O O O
-            {                                          // O O O
-                return Move.Left;
-            }
-            else if (myPosition.X == mapaGry.Min.X)    // O O O
-            {                                          // X O O
-                return Move.Down;                      // O O O
-            }
-            else if (myPosition.X == mapaGry.Min.X)    // O O O
-            {                                          // O O O
-                return Move.Right;                     // O X O
-            }
-            else if (myPosition.X == mapaGry.Min.X)    // O O O
-            {                                          // O O X
-                return Move.Up;                        // O O O
-            }
-            else if (myPosition.X == mapaGry.Min.X)    // O X O
-            {                                          // O O O
-                return Move.Left;                      // O O O
-            }
-            else if (myPosition.X <= (mapaGry.Max.X - 1) / 2)
-            {                                          // O O O
-                return Move.Left;                      // OXO O
-            }                                          // O O O
-            else                                       // O O O
-            {                                          // O OXO
-                return Move.Right;                     // O O O
-            }
+            StrategiaZniszczenia staraStrategiaZniszczenia = (StrategiaZniszczenia)sender;
+            staraStrategiaZniszczenia.GraczeNieOsiagalni -= OnGraczeNieOsiagalni;
+
+            Strategia = new StrategiaPrzetrwania(staraStrategiaZniszczenia);
         }
 
-        private Move WypelniajPrzestrzen()
-        {
-            //TODO: Wypełnainie przestrzeni:
-            return mojOstatniRuch.Skrec(Skrecanie.JedzProsto);
-        }
-
-        private void PrzygotujSie(List<MapPoint> map)
-        {
-            int szerokosc, wysokosc;
-            szerokosc = map.Max(mp => mp.Point.X) + 1;
-            wysokosc = map.Max(mp => mp.Point.Y) + 1;
-
-            mapaGry = new MapaGry(szerokosc, wysokosc);
-
-            mozliwoscInterakcji = Interakcja.Walczacy;
-
-            pierwszyRuch = false;
-        }
+        #endregion
     }
 }

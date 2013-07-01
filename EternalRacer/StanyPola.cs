@@ -1,6 +1,6 @@
-﻿namespace EternalRacer.Enums
+﻿namespace EternalRacer
 {
-    internal enum StanyPola
+    public enum StanyPola
     {
         Wolne,
         ZajeteMoje,
