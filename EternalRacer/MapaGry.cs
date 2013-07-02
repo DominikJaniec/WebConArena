@@ -10,11 +10,7 @@ namespace EternalRacer
         public readonly int Wysokosc;
 
         public readonly Point Max;
-        public readonly Point Min = new Point
-        {
-            X = 0,
-            Y = 0
-        };
+        public readonly Point Min;
 
         #endregion
 
@@ -31,6 +27,11 @@ namespace EternalRacer
             Szerokosc = szerokosc;
             Wysokosc = wysokosc;
 
+            Min = new Point
+            {
+                X = 0,
+                Y = 0
+            };
             Max = new Point
             {
                 X = szerokosc - 1,
@@ -54,15 +55,47 @@ namespace EternalRacer
 
         public void Aktualizuj(Point ja, Point on)
         {
-            mapa[ja.X][ja.Y] = StanyPola.ZajeteMoje;
-            mapa[on.X][on.Y] = StanyPola.ZajeteMoje;
+            mapa[ja.X + Min.X][ja.Y + Min.Y] = StanyPola.ZajeteMoje;
+            mapa[on.X + Min.X][on.Y + Min.Y] = StanyPola.ZajeteJego;
         }
+
+        public bool PoleNiedostepne(Point punkt)
+        {
+            return PoleNiedostepne(punkt.X, punkt.Y);
+        }
+
+        private bool PoleNiedostepne(int X, int Y)
+        {
+            return this[X, Y] != StanyPola.Wolne;
+        }
+
+        #region Indeksery
 
         public StanyPola this[Point punkt]
         {
-            get { return mapa[punkt.X][punkt.Y]; }
-            set { mapa[punkt.X][punkt.Y] = value; }
+            get
+            {
+                return this[punkt.X, punkt.Y];
+            }
         }
+
+        public StanyPola this[int X, int Y]
+        {
+            get
+            {
+                if (X >= Min.X && X <= Max.X &&
+                    Y >= Min.Y && Y <= Max.Y)
+                {
+                    return mapa[X + Min.X][Y + Min.Y];
+                }
+                else
+                {
+                    return StanyPola.PozaSwiatem;
+                }
+            }
+        }
+
+        #endregion
 
         #endregion
     }

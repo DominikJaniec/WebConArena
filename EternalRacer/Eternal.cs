@@ -10,19 +10,45 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.1.2",
+        Version = "0.0.1.4",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
     {
-        #region Metoda z IRacer
+        #region Metoda "GetMove" z IRacer
 
         public Move GetMove(Point myPosition, Point opponentPosition, List<MapPoint> map)
         {
-            return ImplementacjaGetMove(myPosition, opponentPosition, map);
+            return GetMove_Funkcja(myPosition, opponentPosition, map);
         }
 
         #endregion
+
+        #region Implementacja metody "GetMove"
+
+        private Func<Point, Point, List<MapPoint>, Move> GetMove_Funkcja;
+
+        private Move GetMove_PodczasGrzy(Point mojaBiezacaPozycja, Point jegoBiezacaPozycja, List<MapPoint> mapa_nieWykozystywana)
+        {
+            return Strategia.WykonajRuch(mojaBiezacaPozycja, jegoBiezacaPozycja);
+        }
+
+        private Move GetMove_PierwszyRaz(Point mojaStartowa, Point jegoStartowa, List<MapPoint> mapaGry)
+        {
+            int szerokosc = mapaGry.Max(mp => mp.Point.X) + 1;
+            int wysokosc = mapaGry.Max(mp => mp.Point.Y) + 1;
+            Mapa = new MapaGry(szerokosc, wysokosc);
+
+            StrategiaZniszczenia strategiaZniszczenia = new StrategiaZniszczenia(Mapa, mojaStartowa, jegoStartowa);
+            strategiaZniszczenia.GraczeNieOsiagalni += OnGraczeNieOsiagalni;
+            Strategia = strategiaZniszczenia;
+
+            GetMove_Funkcja = GetMove_PodczasGrzy;
+            return GetMove_Funkcja(mojaStartowa, jegoStartowa, mapaGry);
+        }
+
+        #endregion
+
 
         #region Publiczne Własności
 
@@ -33,34 +59,13 @@ namespace EternalRacer
 
         #endregion
 
-        #region Konstruktor
+
+        #region Konstruktor i prywatna zmiana Strategii
 
         public Eternal()
         {
-            ImplementacjaGetMove = new Func<Point, Point, List<MapPoint>, Move>((mojaStartowa, jegoStartowa, mapaGry) =>
-            {
-                ImplementacjaGetMove = (mojaPozycja, jegoPozycja, mapa_zbedna) =>
-                {
-                    return Strategia.WykonajRuch(mojaPozycja, jegoPozycja);
-                };
-
-                int szerokosc = mapaGry.Max(mp => mp.Point.X) + 1;
-                int wysokosc = mapaGry.Max(mp => mp.Point.Y) + 1;
-                Mapa = new MapaGry(szerokosc, wysokosc);
-
-                StrategiaZniszczenia strategiaZniszczenia = new StrategiaZniszczenia(Mapa, mojaStartowa, jegoStartowa);
-                strategiaZniszczenia.GraczeNieOsiagalni += OnGraczeNieOsiagalni;
-                Strategia = strategiaZniszczenia;
-
-                return ImplementacjaGetMove(mojaStartowa, jegoStartowa, mapaGry);
-            });
+            GetMove_Funkcja = GetMove_PierwszyRaz;
         }
-
-        #endregion
-
-        #region Prywatne
-
-        private Func<Point, Point, List<MapPoint>, Move> ImplementacjaGetMove;
 
         private void OnGraczeNieOsiagalni(object sender, EventArgs e)
         {

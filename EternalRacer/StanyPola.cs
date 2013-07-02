@@ -4,6 +4,7 @@
     {
         Wolne,
         ZajeteMoje,
-        ZajeteJego
+        ZajeteJego,
+        PozaSwiatem
     }
 }
