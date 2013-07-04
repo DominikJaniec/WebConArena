@@ -1,4 +1,5 @@
 ﻿using EternalRacer.GameMap;
+using System;
 
 namespace EternalRacer.GameStrategies
 {
@@ -45,6 +46,13 @@ namespace EternalRacer.GameStrategies
 
         protected abstract Directions ComputeNextMovment();
 
+        #endregion
+
+        #region Override ToString
+        public override string ToString()
+        {
+            return String.Format("Player: {0} | Enemy: {1}", Player, Enemy);
+        }
         #endregion
     }
 }

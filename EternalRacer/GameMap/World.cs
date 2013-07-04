@@ -1,4 +1,6 @@
-﻿namespace EternalRacer.GameMap
+﻿using System;
+
+namespace EternalRacer.GameMap
 {
     public class World
     {
@@ -86,6 +88,13 @@
             set { this[point.X, point.Y] = value.ToInt(); }
         }
 
+        #endregion
+
+        #region Override ToString
+        public override string ToString()
+        {
+            return String.Format("WorldMap - {0}", Properties);
+        }
         #endregion
     }
 }

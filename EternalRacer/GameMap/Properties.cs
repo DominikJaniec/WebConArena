@@ -31,5 +31,12 @@ namespace EternalRacer.GameMap
         }
 
         #endregion
+
+        #region Override ToString
+        public override string ToString()
+        {
+            return String.Format("X <{0}, {1}>: {2} | Y <{3}, {4}>: {5}", XMin, XMax, Width, YMin, YMax, Height);
+        }
+        #endregion
     }
 }

@@ -12,5 +12,12 @@ namespace EternalRacer.GameStrategies
         {
             throw new NotImplementedException();
         }
+
+        #region Override ToString
+        public override string ToString()
+        {
+            return String.Format("Strategy: {0} - {1}", Strategies.Rivalry, base.ToString());
+        }
+        #endregion
     }
 }
