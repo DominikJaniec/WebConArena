@@ -1,78 +1,93 @@
-﻿using EternalRacer.Strategie;
-using EternalRacer.Strategie.Przetrwanie;
-using EternalRacer.Strategie.Zniszczenie;
+﻿using EternalRacer.GameMap;
+using EternalRacer.GameStrategies;
 using System;
 using System.AddIn;
 using System.Collections.Generic;
-using System.Linq;
 using WebCon.Arena.Bots.AddIn;
 
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.1.5",
+        Version = "0.0.2.1",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
     {
-        #region Metoda "GetMove" z IRacer
+        #region Public properties
 
-        public Move GetMove(Point myPosition, Point opponentPosition, List<MapPoint> map)
-        {
-            return GetMove_Funkcja(myPosition, opponentPosition, map);
-        }
+        public World WorldGameMap { get; private set; }
 
-        #endregion
-
-        #region Implementacja metody "GetMove"
-
-        private Func<Point, Point, List<MapPoint>, Move> GetMove_Funkcja;
-
-        private Move GetMove_PodczasGrzy(Point mojaBiezacaPozycja, Point jegoBiezacaPozycja, List<MapPoint> mapa_nieWykozystywana)
-        {
-            return Strategia.WykonajRuch(mojaBiezacaPozycja, jegoBiezacaPozycja);
-        }
-
-        private Move GetMove_PierwszyRaz(Point mojaStartowa, Point jegoStartowa, List<MapPoint> mapaGry)
-        {
-            int szerokosc = mapaGry.Max(mp => mp.Point.X) + 1;
-            int wysokosc = mapaGry.Max(mp => mp.Point.Y) + 1;
-            Mapa = new MapaGry(szerokosc, wysokosc);
-
-            StrategiaZniszczenia strategiaZniszczenia = new StrategiaZniszczenia(Mapa, mojaStartowa, jegoStartowa);
-            strategiaZniszczenia.GraczeNieOsiagalni += OnGraczeNieOsiagalni;
-            Strategia = strategiaZniszczenia;
-
-            GetMove_Funkcja = GetMove_PodczasGrzy;
-            return GetMove_Funkcja(mojaStartowa, jegoStartowa, mapaGry);
-        }
+        public AStrategy GameStrategy { get; private set; }
+        public Strategies CurrentStrategy { get; private set; }
 
         #endregion
 
-
-        #region Publiczne Własności
-
-        public MapaGry Mapa { get; private set; }
-
-        internal AStrategia Strategia { get; set; }
-        public RodzajeStrategii BiezacaStrategia { get; internal set; }
-
-        #endregion
-
-
-        #region Konstruktor i prywatna zmiana Strategii
+        #region Constructor
 
         public Eternal()
         {
-            GetMove_Funkcja = GetMove_PierwszyRaz;
+            GetMoveFuns = FirstGetMove;
         }
 
-        private void OnGraczeNieOsiagalni(object sender, EventArgs e)
-        {
-            StrategiaZniszczenia staraStrategiaZniszczenia = (StrategiaZniszczenia)sender;
-            staraStrategiaZniszczenia.GraczeNieOsiagalni -= OnGraczeNieOsiagalni;
+        #endregion
 
-            Strategia = new StrategiaPrzetrwania(staraStrategiaZniszczenia);
+        #region Method GetMove from IRacer
+
+        public Move GetMove(Point myPosition, Point opponentPosition, List<MapPoint> map)
+        {
+            return GetMoveFuns(myPosition, opponentPosition, map);
+        }
+
+        #endregion
+
+        #region GetMove's implementations
+
+        private Func<Point, Point, List<MapPoint>, Move> GetMoveFuns;
+
+        private Move InGameGetMove(Point myCurrent, Point opponentCurrent, List<MapPoint> map_notUsed)
+        {
+            return GameStrategy.NextMove(myCurrent.ToSpot(), opponentCurrent.ToSpot()).ToMove();
+        }
+
+        private Move FirstGetMove(Point myStartPosition, Point opponentStartPosition, List<MapPoint> mapPointList)
+        {
+            WorldGameMap = PrepareMap(mapPointList);
+            GameStrategy = new StrategyRivalry(WorldGameMap, myStartPosition.ToSpot(), opponentStartPosition.ToSpot());
+
+            GetMoveFuns = InGameGetMove;
+            return GetMoveFuns(myStartPosition, opponentStartPosition, mapPointList);
+        }
+
+        private World PrepareMap(List<MapPoint> mapPointList)
+        {
+            int minX = Int32.MaxValue;
+            int maxX = Int32.MinValue;
+            int minY = Int32.MaxValue;
+            int maxY = Int32.MinValue;
+
+            mapPointList.ForEach(mp =>
+            {
+                if (mp.Point.X < minX)
+                {
+                    minX = mp.Point.X;
+                }
+                else if (mp.Point.X > maxX)
+                {
+                    maxX = mp.Point.X;
+                }
+
+                if (mp.Point.Y < minY)
+                {
+                    minY = mp.Point.Y;
+                }
+                else if (mp.Point.Y > maxY)
+                {
+                    maxY = mp.Point.Y;
+                }
+            });
+
+            Properties mapProperties = new Properties(minX, maxX, minY, maxY);
+            return new World(mapProperties);
         }
 
         #endregion

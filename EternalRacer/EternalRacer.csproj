@@ -46,7 +46,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Eternal.cs" />
-    <Compile Include="MapaGry.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="GameMap\Directions.cs" />
+    <Compile Include="GameMap\Spot.cs" />
+    <Compile Include="GameMap\SpotStateExtensions.cs" />
+    <Compile Include="GameMap\SpotState.cs" />
+    <Compile Include="GameMap\World.cs" />
+    <Compile Include="GameMap\Properties.cs" />
+    <Compile Include="GameStrategies\AStrategy.cs" />
+    <Compile Include="GameStrategies\StrategyRivalry.cs" />
+    <Compile Include="GameStrategies\Strategies.cs" />
+    <Compile Include="GameStrategies\StrategySurvival.cs" />
     <Compile Include="Pathfinding\AStarPathfinder.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />
     <Compile Include="PriorityQueue\IPriorityItem.cs" />
@@ -54,12 +64,6 @@
     <Compile Include="PriorityQueue\MessageItem.cs" />
     <Compile Include="PriorityQueue\PriorityQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StanyPola.cs" />
-    <Compile Include="Strategie\RodzajeStrategii.cs" />
-    <Compile Include="Strategie\StanGracza.cs" />
-    <Compile Include="Strategie\AStrategia.cs" />
-    <Compile Include="Strategie\Przetrwanie\StrategiaPrzetrwania.cs" />
-    <Compile Include="Strategie\Zniszczenie\StrategiaZniszczenia.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="arena.exe.config" />
