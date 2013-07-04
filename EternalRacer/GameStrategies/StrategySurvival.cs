@@ -1,22 +1,21 @@
-﻿using System;
+﻿using EternalRacer.GameMap;
+using System;
 
 namespace EternalRacer.GameStrategies
 {
     public class StrategySurvival : AStrategy
     {
+        public override Strategies Kind
+        {
+            get { return Strategies.Survival; }
+        }
+
         public StrategySurvival(AStrategy lastStrategy)
             : base(lastStrategy) { }
 
-        protected override GameMap.Directions ComputeNextMovment()
+        protected override Directions ComputeNextMovment()
         {
             throw new NotImplementedException();
         }
-
-        #region Override ToString
-        public override string ToString()
-        {
-            return String.Format("Strategy: {0} - {1}", Strategies.Survival, base.ToString());
-        }
-        #endregion
     }
 }

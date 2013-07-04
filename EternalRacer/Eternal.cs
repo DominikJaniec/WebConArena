@@ -8,7 +8,7 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.2.1",
+        Version = "0.0.2.3",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
@@ -18,7 +18,6 @@ namespace EternalRacer
         public World WorldGameMap { get; private set; }
 
         public AStrategy GameStrategy { get; private set; }
-        public Strategies CurrentStrategy { get; private set; }
 
         #endregion
 

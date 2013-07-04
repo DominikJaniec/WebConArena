@@ -11,6 +11,8 @@ namespace EternalRacer.GameStrategies
         public Spot Player { get; private set; }
         public Spot Enemy { get; private set; }
 
+        public abstract Strategies Kind { get; }
+
         #endregion
 
         #region Constructors
@@ -51,7 +53,7 @@ namespace EternalRacer.GameStrategies
         #region Override ToString
         public override string ToString()
         {
-            return String.Format("Player: {0} | Enemy: {1}", Player, Enemy);
+            return String.Format("{0} - Player: {0} | Enemy: {1}", Kind, Player, Enemy);
         }
         #endregion
     }
