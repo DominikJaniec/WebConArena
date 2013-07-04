@@ -1,10 +1,13 @@
-﻿namespace EternalRacer.PriorityQueue
+﻿using System.Collections.Generic;
+
+namespace EternalRacer.PriorityQueue
 {
-    public interface IPriorityQueue<T>
+    public interface IPriorityQueue<TKey, TItem> where TItem : IPriorityItem<TKey, TItem>
     {
-        bool Insert(T item);
-        T PullHighest();
-        T PeekHighest();
+        bool Insert(TItem item);
+
+        TItem PullHighest();
+        TItem PeekHighest();
 
         void Clear();
 

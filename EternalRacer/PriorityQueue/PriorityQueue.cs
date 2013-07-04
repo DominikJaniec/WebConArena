@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace EternalRacer.PriorityQueue
 {
-    public class PriorityQueue<T> : IPriorityQueue<T> where T : IPriorityItem
+    //public class PriorityQueue<TPriorityItem, TItem> : IPriorityQueue<TPriorityItem> where TPriorityItem : IPriorityItem<TItem>
+    public class PriorityQueue<TPriorityKey, TPriorityItem> : IPriorityQueue<TPriorityKey, TPriorityItem> where TPriorityItem : IPriorityItem<TPriorityKey, TPriorityItem>
     {
         #region Heap Private fields
 
         private const int HighestItemIndex = 1;
 
-        private readonly T[] HeapArray;
+        private readonly TPriorityItem[] HeapArray;
         private readonly int ArraySize;
 
         private int ItemsCount;
@@ -25,24 +26,24 @@ namespace EternalRacer.PriorityQueue
         // By Dominik Janiec in 2013                                                                //
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void MaxHeapInsert(T item)
+        private void MaxHeapInsert(TPriorityItem item)
         {
             ++ItemsCount;
             HeapArray[ItemsCount] = item;
             HeapSiftUp(ItemsCount);
         }
 
-        private T HeapMaximum()
+        private TPriorityItem HeapMaximum()
         {
             return HeapArray[HighestItemIndex];
         }
 
-        private T HeapExtractMax()
+        private TPriorityItem HeapExtractMax()
         {
-            T MostImportatnItem = HeapMaximum();
+            TPriorityItem MostImportatnItem = HeapMaximum();
 
             HeapArray[HighestItemIndex] = HeapArray[ItemsCount];
-            HeapArray[ItemsCount] = default(T);
+            HeapArray[ItemsCount] = default(TPriorityItem);
             --ItemsCount;
 
             MaxHeapify(HighestItemIndex);
@@ -101,7 +102,7 @@ namespace EternalRacer.PriorityQueue
 
         private void SwapItemsByIndex(int firstItemIndex, int secondItemIndex)
         {
-            T tempItem = HeapArray[secondItemIndex];
+            TPriorityItem tempItem = HeapArray[secondItemIndex];
             HeapArray[secondItemIndex] = HeapArray[firstItemIndex];
             HeapArray[firstItemIndex] = tempItem;
         }
@@ -123,7 +124,7 @@ namespace EternalRacer.PriorityQueue
 
         #region Public Interface - Methods
 
-        public bool Insert(T item)
+        public bool Insert(TPriorityItem item)
         {
             if (IsFull == false)
             {
@@ -136,7 +137,7 @@ namespace EternalRacer.PriorityQueue
             }
         }
 
-        public T PullHighest()
+        public TPriorityItem PullHighest()
         {
             if (IsEmpty == false)
             {
@@ -148,7 +149,7 @@ namespace EternalRacer.PriorityQueue
             }
         }
 
-        public T PeekHighest()
+        public TPriorityItem PeekHighest()
         {
             if (IsEmpty == false)
             {
@@ -182,7 +183,7 @@ namespace EternalRacer.PriorityQueue
                 throw new ArgumentOutOfRangeException("size", size, String.Format("HAVE to be smaller than {0}", Int32.MaxValue));
             }
 
-            HeapArray = new T[size + HighestItemIndex];
+            HeapArray = new TPriorityItem[size + HighestItemIndex];
 
             ArraySize = size;
             ItemsCount = 0;
@@ -190,7 +191,7 @@ namespace EternalRacer.PriorityQueue
 
         #region Filling Constructor
 
-        public PriorityQueue(IEnumerable<T> collection, int? size = null)
+        public PriorityQueue(IEnumerable<TPriorityItem> collection, int? size = null)
         {
             if (size.HasValue == true)
             {
@@ -215,7 +216,7 @@ namespace EternalRacer.PriorityQueue
                 }
             }
 
-            List<T> collectionList = new List<T>(0);
+            List<TPriorityItem> collectionList = new List<TPriorityItem>(0);
             if ((collection == null) == false)
             {
                 if (size.HasValue == false)
@@ -230,16 +231,16 @@ namespace EternalRacer.PriorityQueue
 
             if (size.HasValue == true)
             {
-                HeapArray = new T[size.Value + HighestItemIndex];
+                HeapArray = new TPriorityItem[size.Value + HighestItemIndex];
                 ArraySize = size.Value;
             }
             else
             {
                 ArraySize = collectionList.Count;
-                HeapArray = new T[ArraySize + HighestItemIndex];
+                HeapArray = new TPriorityItem[ArraySize + HighestItemIndex];
             }
 
-            foreach (T item in collectionList)
+            foreach (TPriorityItem item in collectionList)
             {
                 MaxHeapInsert(item);
                 ++ItemsCount;

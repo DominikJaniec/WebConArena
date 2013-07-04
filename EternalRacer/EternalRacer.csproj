@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Eternal.cs" />
     <Compile Include="MapaGry.cs" />
+    <Compile Include="Pathfinding\AStarPathfinder.cs" />
+    <Compile Include="Pathfinding\PathNode.cs" />
     <Compile Include="PriorityQueue\IPriorityItem.cs" />
     <Compile Include="PriorityQueue\IPriorityQueue.cs" />
     <Compile Include="PriorityQueue\MessageItem.cs" />

@@ -1,8 +1,9 @@
 ﻿namespace EternalRacer.PriorityQueue
 {
-    public interface IPriorityItem
+    public interface IPriorityItem<TKey, TItem>
     {
-        int Priority { get; }
-        bool IsMoreImportantThan(IPriorityItem thatOne);
+        TKey PriorityKey { get; }
+
+        bool IsMoreImportantThan(TItem thatOne);
     }
 }

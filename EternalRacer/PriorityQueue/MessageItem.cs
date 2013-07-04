@@ -2,21 +2,22 @@
 
 namespace EternalRacer.PriorityQueue
 {
-    [DebuggerDisplay("({Priority}) {Message}")]
-    public class MessageItem : IPriorityItem
+    [DebuggerDisplay("({PriorityKey}) {Message}")]
+    public class MessageItem : IPriorityItem<int, MessageItem>
     {
-        public int Priority { get; private set; }
         public string Message { get; private set; }
+
+        public int PriorityKey { get; set; }
 
         public MessageItem(string message, int priority = 0)
         {
-            Priority = priority;
+            PriorityKey = priority;
             Message = message;
         }
 
-        public bool IsMoreImportantThan(IPriorityItem thatOne)
+        public bool IsMoreImportantThan(MessageItem thatOne)
         {
-            return this.Priority < thatOne.Priority;
+            return PriorityKey < thatOne.PriorityKey;
         }
     }
 }
