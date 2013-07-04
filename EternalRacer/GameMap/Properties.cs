@@ -26,8 +26,8 @@ namespace EternalRacer.GameMap
             YMin = yMin;
             YMax = yMax;
 
-            Width = XMax - XMin;
-            Height = YMax - YMin;
+            Width = XMax - XMin + 1;
+            Height = YMax - YMin + 1;
         }
 
         #endregion

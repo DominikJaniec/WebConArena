@@ -164,9 +164,8 @@ namespace EternalRacer.Pathfinding
 
             UpdatePlayersPosition(startPlayerPosition, startEnemyPosition);
 
-            OpenPriorityQueue = new PriorityQueue<double, PathNode>(GridSize);
-            OpenHashSet = new HashSet<PathNode>();
-            ClosedHashSet = new HashSet<PathNode>();
+            OpenQueue = new PriorityQueue<double, PathNode>(GridSize);
+            ClosedSet = new HashSet<PathNode>();
         }
 
         #endregion
@@ -183,61 +182,56 @@ namespace EternalRacer.Pathfinding
             return new List<Move>(0);
         }
 
-        private PriorityQueue<double, PathNode> OpenPriorityQueue;
-        private HashSet<PathNode> OpenHashSet;
-        private HashSet<PathNode> ClosedHashSet;
+        private PriorityQueue<double, PathNode> OpenQueue;
+        private HashSet<PathNode> ClosedSet;
 
         private List<Move> CalculateMovmentsPathFromPlayerToEnemy()
         {
             PathNode startFrom = WorldGrid[PointToIndex(PlayerPosition)];
             PathNode goalNode = WorldGrid[PointToIndex(ProbableEnemyPosition)];
 
-            OpenPriorityQueue.Clear();
-            OpenHashSet.Clear();
+            OpenQueue.Clear();
+            OpenQueue.Insert(startFrom);
 
-            OpenPriorityQueue.Insert(startFrom);
-            OpenHashSet.Add(startFrom);
-
-            ClosedHashSet.Clear();
+            ClosedSet.Clear();
 
 
-            while (!OpenPriorityQueue.IsEmpty)
+            while (!OpenQueue.IsEmpty)
             {
-                PathNode current = OpenPriorityQueue.PullHighest();
+                PathNode current = OpenQueue.PullHighest();
                 if (current.Equals(goalNode))
                 {
                     return RetriveMovmentsByPath(current);
                 }
 
-                OpenHashSet.Remove(current);
-                ClosedHashSet.Add(current);
+                ClosedSet.Add(current);
 
                 List<PathNode> currentSuccessors = RetrieveWalkableNeighbourhood(current);
                 for (int i = 0; i < currentSuccessors.Count; ++i)
                 {
                     PathNode successor = currentSuccessors[i];
 
-                    if (ClosedHashSet.Contains(successor))
+                    if (ClosedSet.Contains(successor))
                     {
                         continue;
                     }
 
-                    if (!OpenHashSet.Contains(successor))
+                    if (!OpenQueue.Contains(successor))
                     {
                         successor.HRecalculate(startFrom, goalNode);
                         successor.ParentNode = current;
                         successor.GRecalculate();
 
-                        OpenHashSet.Add(successor);
-                        OpenPriorityQueue.Insert(successor);
+                        OpenQueue.Insert(successor);
                     }
                     else
                     {
                         if (successor.G > current.G + 1)
                         {
-                            //TODO: Przypadek lepszej scieżki.
-                            throw new NotImplementedException("Wymaga implementacji zmieniania priorytetu danego itemu w kolejce.");
-                            // Zmiana rodzica na bieżacy i przeliczenie G i co za soba pociaga F, a przez to pozycji w kolejce priorytetowej...
+                            successor.ParentNode = current;
+                            successor.GRecalculate();
+
+                            OpenQueue.ItemPriorityChanged(successor);
                         }
                     }
                 }

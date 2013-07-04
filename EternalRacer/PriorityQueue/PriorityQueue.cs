@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace EternalRacer.PriorityQueue
 {
-    //public class PriorityQueue<TPriorityItem, TItem> : IPriorityQueue<TPriorityItem> where TPriorityItem : IPriorityItem<TItem>
     public class PriorityQueue<TPriorityKey, TPriorityItem> : IPriorityQueue<TPriorityKey, TPriorityItem> where TPriorityItem : IPriorityItem<TPriorityKey, TPriorityItem>
     {
         #region Heap Private fields
@@ -15,6 +15,8 @@ namespace EternalRacer.PriorityQueue
         private readonly int ArraySize;
 
         private int ItemsCount;
+
+        private Dictionary<TPriorityItem, int> HeapArrayIndexes;
 
         #endregion
 
@@ -30,6 +32,8 @@ namespace EternalRacer.PriorityQueue
         {
             ++ItemsCount;
             HeapArray[ItemsCount] = item;
+            HeapArrayIndexes.Add(item, ItemsCount);
+
             HeapSiftUp(ItemsCount);
         }
 
@@ -44,11 +48,41 @@ namespace EternalRacer.PriorityQueue
 
             HeapArray[HighestItemIndex] = HeapArray[ItemsCount];
             HeapArray[ItemsCount] = default(TPriorityItem);
+            HeapArrayIndexes.Remove(MostImportatnItem);
             --ItemsCount;
 
             MaxHeapify(HighestItemIndex);
 
             return MostImportatnItem;
+        }
+
+        private void HeapChangePriority(int itemIndex)
+        {
+            int parentItemIndex = ParentIndex(itemIndex);
+            if (parentItemIndex >= HighestItemIndex &&
+                HeapArray[parentItemIndex].IsMoreImportantThan(HeapArray[itemIndex]) == false)
+            {
+                HeapSiftUp(itemIndex);
+            }
+            else
+            {
+                MaxHeapify(itemIndex);
+            }
+        }
+
+        private void HeapRemoveAt(int itemIndex)
+        {
+            TPriorityItem Item = HeapArray[itemIndex];
+
+            HeapArray[itemIndex] = HeapArray[ItemsCount];
+            HeapArray[ItemsCount] = default(TPriorityItem);
+            HeapArrayIndexes.Remove(Item);
+            --ItemsCount;
+
+            if (itemIndex < ItemsCount)
+            {
+                HeapChangePriority(itemIndex);
+            }
         }
 
         #region Helper Heap Function
@@ -105,6 +139,9 @@ namespace EternalRacer.PriorityQueue
             TPriorityItem tempItem = HeapArray[secondItemIndex];
             HeapArray[secondItemIndex] = HeapArray[firstItemIndex];
             HeapArray[firstItemIndex] = tempItem;
+
+            HeapArrayIndexes[HeapArray[firstItemIndex]] = firstItemIndex;
+            HeapArrayIndexes[HeapArray[secondItemIndex]] = secondItemIndex;
         }
 
         #endregion
@@ -115,25 +152,56 @@ namespace EternalRacer.PriorityQueue
         #region Public Interface - Properties
 
         public int Count { get { return ItemsCount; } }
-        public int MaxElements { get { return ArraySize; } }
+        public int Size { get { return ArraySize; } }
 
-        public bool IsFull { get { return ItemsCount == ArraySize; } }
-        public bool IsEmpty { get { return ItemsCount == 0; } }
+        public bool IsFull { get { return ItemsCount >= ArraySize; } }
+        public bool IsEmpty { get { return ItemsCount <= 0; } }
+
+        public bool IsReadOnly { get { return false; } }
 
         #endregion
 
         #region Public Interface - Methods
 
-        public bool Insert(TPriorityItem item)
+        public bool ItemPriorityChanged(TPriorityItem item)
         {
-            if (IsFull == false)
+            if (Contains(item))
             {
-                MaxHeapInsert(item);
+                HeapChangePriority(HeapArrayIndexes[item]);
                 return true;
             }
             else
             {
                 return false;
+            }
+        }
+
+        public bool Insert(TPriorityItem item)
+        {
+            if (IsFull == true || Contains(item))
+            {
+                return false;
+            }
+            else
+            {
+                MaxHeapInsert(item);
+                return true;
+            }
+        }
+
+        public void Add(TPriorityItem item)
+        {
+            if (IsFull)
+            {
+                throw new InvalidOperationException("Can NOT Add to full queue.");
+            }
+            else if (Contains(item))
+            {
+                throw new InvalidOperationException("Can NOT Add item multiple times.");
+            }
+            else
+            {
+                Insert(item);
             }
         }
 
@@ -161,14 +229,32 @@ namespace EternalRacer.PriorityQueue
             }
         }
 
+        public bool Contains(TPriorityItem item)
+        {
+            return HeapArrayIndexes.ContainsKey(item);
+        }
+
+        public bool Remove(TPriorityItem item)
+        {
+            if (Contains(item))
+            {
+                HeapRemoveAt(HeapArrayIndexes[item]);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void Clear()
         {
             Array.Clear(HeapArray, 0, ArraySize + HighestItemIndex);
+            HeapArrayIndexes.Clear();
             ItemsCount = 0;
         }
 
         #endregion
-
 
         #region Constructors
 
@@ -183,62 +269,31 @@ namespace EternalRacer.PriorityQueue
                 throw new ArgumentOutOfRangeException("size", size, String.Format("HAVE to be smaller than {0}", Int32.MaxValue));
             }
 
-            HeapArray = new TPriorityItem[size + HighestItemIndex];
-
             ArraySize = size;
             ItemsCount = 0;
+
+            HeapArray = new TPriorityItem[ArraySize + HighestItemIndex];
+            HeapArrayIndexes = new Dictionary<TPriorityItem, int>(ArraySize);
         }
 
-        #region Filling Constructor
-
-        public PriorityQueue(IEnumerable<TPriorityItem> collection, int? size = null)
+        public PriorityQueue(IEnumerable<TPriorityItem> collection)
         {
-            if (size.HasValue == true)
+            if (collection == null)
             {
-                if (size.Value < 1)
-                {
-                    throw new ArgumentOutOfRangeException("size", size, "Can NOT be smaller than 1");
-                }
-                if (size.Value == Int32.MaxValue)
-                {
-                    throw new ArgumentOutOfRangeException("size", size, String.Format("HAVE to be smaller than {0}", Int32.MaxValue));
-                }
+                throw new ArgumentNullException("collection", "Indeterminable size of queue, because also parameter \"size\" has NO value.");
             }
-            else
+            if (collection.Any() == false)
             {
-                if (collection == null)
-                {
-                    throw new ArgumentNullException("collection", "Indeterminable size of queue, because also parameter \"size\" has NO value.");
-                }
-                if (collection.Any() == false)
-                {
-                    throw new ArgumentException("Indeterminable size of queue. Parameter \"collection\" is empty, and also parameter \"size\" has NO value.");
-                }
+                throw new ArgumentException("Indeterminable size of queue. Parameter \"collection\" is empty, and also parameter \"size\" has NO value.");
             }
 
-            List<TPriorityItem> collectionList = new List<TPriorityItem>(0);
-            if ((collection == null) == false)
-            {
-                if (size.HasValue == false)
-                {
-                    collectionList = collection.ToList();
-                }
-                else
-                {
-                    collectionList = collection.Take(size.Value).ToList();
-                }
-            }
+            List<TPriorityItem> collectionList = collection.ToList();
 
-            if (size.HasValue == true)
-            {
-                HeapArray = new TPriorityItem[size.Value + HighestItemIndex];
-                ArraySize = size.Value;
-            }
-            else
-            {
-                ArraySize = collectionList.Count;
-                HeapArray = new TPriorityItem[ArraySize + HighestItemIndex];
-            }
+            ArraySize = collectionList.Count;
+            ItemsCount = 0;
+
+            HeapArray = new TPriorityItem[ArraySize + HighestItemIndex];
+            HeapArrayIndexes = new Dictionary<TPriorityItem, int>(ArraySize);
 
             foreach (TPriorityItem item in collectionList)
             {
@@ -248,6 +303,29 @@ namespace EternalRacer.PriorityQueue
         }
 
         #endregion
+
+        #region Shoud not be Implemented?
+
+        public IEnumerator<TPriorityItem> GetEnumerator()
+        {
+            return SourcePriorityItemList().AsReadOnly().GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            IEnumerable source = SourcePriorityItemList().AsReadOnly();
+            return source.GetEnumerator();
+        }
+
+        public void CopyTo(TPriorityItem[] array, int arrayIndex)
+        {
+            SourcePriorityItemList().CopyTo(array, arrayIndex);
+        }
+
+        private List<TPriorityItem> SourcePriorityItemList()
+        {
+            return HeapArrayIndexes.Select(kvp => kvp.Key).ToList();
+        }
 
         #endregion
     }

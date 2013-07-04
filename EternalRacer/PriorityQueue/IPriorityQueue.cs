@@ -2,17 +2,15 @@
 
 namespace EternalRacer.PriorityQueue
 {
-    public interface IPriorityQueue<TKey, TItem> where TItem : IPriorityItem<TKey, TItem>
+    public interface IPriorityQueue<TKey, TItem> : ICollection<TItem> where TItem : IPriorityItem<TKey, TItem>
     {
+        bool ItemPriorityChanged(TItem item);
         bool Insert(TItem item);
 
         TItem PullHighest();
-        TItem PeekHighest();
+        TItem PeekHighest();        
 
-        void Clear();
-
-        int Count { get; }
-        int MaxElements { get; }
+        int Size { get; }
 
         bool IsFull { get; }
         bool IsEmpty { get; }
