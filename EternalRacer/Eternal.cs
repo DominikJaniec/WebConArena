@@ -1,5 +1,5 @@
-﻿using EternalRacer.GameMap;
-using EternalRacer.GameStrategies;
+﻿using EternalRacer.Map;
+using EternalRacer.Strategies;
 using System;
 using System.AddIn;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.2.4",
+        Version = "0.0.2.7",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
@@ -45,13 +45,13 @@ namespace EternalRacer
 
         private Move InGameGetMove(Point myCurrent, Point opponentCurrent, List<MapPoint> map_notUsed)
         {
-            return GameStrategy.NextMove(myCurrent.ToSpot(), opponentCurrent.ToSpot()).ToMove();
+            return GameStrategy.NextMove(myCurrent.ToCoordinate(), opponentCurrent.ToCoordinate()).ToMove();
         }
 
         private Move FirstGetMove(Point myStartPosition, Point opponentStartPosition, List<MapPoint> mapPointList)
         {
             WorldGameMap = PrepareMap(mapPointList);
-            GameStrategy = new StrategyRivalry(WorldGameMap, myStartPosition.ToSpot(), opponentStartPosition.ToSpot());
+            GameStrategy = new StrategyRivalry(WorldGameMap, myStartPosition.ToCoordinate(), opponentStartPosition.ToCoordinate());
 
 
             //TODO 1: Implementacja strategi przetrwania.

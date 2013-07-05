@@ -1,7 +1,7 @@
-﻿using EternalRacer.GameMap;
+﻿using EternalRacer.Map;
 using System;
 
-namespace EternalRacer.GameStrategies
+namespace EternalRacer.Strategies
 {
     public class StrategyRivalry : AStrategy
     {
@@ -10,7 +10,7 @@ namespace EternalRacer.GameStrategies
             get { return Strategies.Rivalry; }
         }
 
-        public StrategyRivalry(World map, Spot player, Spot enemy)
+        public StrategyRivalry(World map, Coordinate player, Coordinate enemy)
             : base(map, player, enemy) { }
 
         protected override Directions ComputeNextMovment()

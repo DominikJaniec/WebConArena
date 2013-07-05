@@ -1,5 +1,8 @@
-﻿namespace EternalRacer.GameMap
+﻿namespace EternalRacer.Map
 {
+    /// <summary>
+    /// Directions in World.
+    /// </summary>
     public enum Directions
     {
         North,

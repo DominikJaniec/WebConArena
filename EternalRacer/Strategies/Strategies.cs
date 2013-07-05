@@ -1,4 +1,4 @@
-﻿namespace EternalRacer.GameStrategies
+﻿namespace EternalRacer.Strategies
 {
     public enum Strategies
     {

@@ -1,7 +1,7 @@
-﻿using EternalRacer.GameMap;
+﻿using EternalRacer.Map;
 using System;
 
-namespace EternalRacer.GameStrategies
+namespace EternalRacer.Strategies
 {
     public abstract class AStrategy
     {
@@ -17,11 +17,11 @@ namespace EternalRacer.GameStrategies
 
         #region Constructors
 
-        public AStrategy(World map, Spot player, Spot enemy)
+        public AStrategy(World map, Coordinate player, Coordinate enemy)
         {
             Map = map;
-            Player = player;
-            Enemy = enemy;
+            Player = map[player];
+            Enemy = map[enemy];
         }
 
         public AStrategy(AStrategy lastStrategy)
@@ -35,13 +35,13 @@ namespace EternalRacer.GameStrategies
 
         #region Movment computing
 
-        public Directions NextMove(Spot playerNow, Spot enemyNow)
+        public Directions NextMove(Coordinate playerNow, Coordinate enemyNow)
         {
-            Player = playerNow;
-            Map[Player] = SpotState.Occupy;
+            Map[playerNow].State = SpotStates.Occupy;
+            Player = Map[playerNow];
 
-            Enemy = enemyNow;
-            Map[enemyNow] = SpotState.Occupy;
+            Map[enemyNow].State = SpotStates.Occupy;
+            Enemy = Map[enemyNow];
 
             return ComputeNextMovment();
         }
@@ -53,7 +53,7 @@ namespace EternalRacer.GameStrategies
         #region Override ToString
         public override string ToString()
         {
-            return String.Format("{0} - Player: {1} | Enemy: {2}", Kind, Player, Enemy);
+            return String.Format("{0} - Player: {1} | Enemy: {2}", Kind, Player.Coord, Enemy.Coord);
         }
         #endregion
     }

@@ -1,4 +1,4 @@
-﻿using EternalRacer.GameMap;
+﻿using EternalRacer.Map;
 using System;
 using WebCon.Arena.Bots.AddIn;
 
@@ -6,16 +6,16 @@ namespace EternalRacer
 {
     public static class Extensions
     {
-        #region On: WebCon.Arena.Bots.AddIn.Point => EternalRacer.GameMap.Spot
+        #region On: WebCon.Arena.Bots.AddIn.Point => EternalRacer.Map.Coordinate
 
-        public static Spot ToSpot(this Point point)
+        public static Coordinate ToCoordinate(this Point point)
         {
-            return new Spot(point.X, point.Y);
+            return new Coordinate(point.X, point.Y);
         }
 
         #endregion
 
-        #region On: EternalRacer.GameMap.Directions => WebCon.Arena.Bots.AddIn.Move
+        #region On: EternalRacer.Map.Directions => WebCon.Arena.Bots.AddIn.Move
 
         public static Move ToMove(this Directions direction)
         {
