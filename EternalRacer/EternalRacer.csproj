@@ -50,7 +50,6 @@
     <Compile Include="Map\Coordinate.cs" />
     <Compile Include="Map\Directions.cs" />
     <Compile Include="Map\Spot.cs" />
-    <Compile Include="Map\SpotDirection.cs" />
     <Compile Include="Map\SpotStates.cs" />
     <Compile Include="Map\World.cs" />
     <Compile Include="Map\Properties.cs" />

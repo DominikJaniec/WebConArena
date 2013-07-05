@@ -19,33 +19,37 @@ namespace EternalRacer.Strategies
 
         protected override Directions ComputeNextMovment()
         {
-            return Directions.South;
+            Dictionary<Spot, int> nextSpotsNumberOfReachableNeighbours = new Dictionary<Spot, int>(3);
+            int minimumReachableNeighbours = Int32.MaxValue;
 
-            //IEnumerable<Spot> nearestWalkableSpots = Map.NearestWalkableNeighbourhood(Player);
-            //Dictionary<Spot, int> nextSpotNumberOfOccupies = new Dictionary<Spot, int>(3);
+            foreach (Spot spot in Player.RetriveReachableNeighbours)
+            {
+                int reachableNeighbours = spot.PossibleDirections.Count();
+                //--reachableNeighbours; // Becouse, We can not go back...
 
-            //int maximumNotWalkable = Int32.MinValue;
+                nextSpotsNumberOfReachableNeighbours.Add(spot, reachableNeighbours);
 
-            //foreach (Spot spot in nearestWalkableSpots)
-            //{
-            //    int occupies = spot.NeighbourhoodNearest.Count(s => Map.IsWalkable(s) == false);
-            //    --occupies; // Becouse, We can not go back...
+                if (reachableNeighbours < minimumReachableNeighbours)
+                {
+                    minimumReachableNeighbours = reachableNeighbours;
+                }
+            }
 
-            //    nextSpotNumberOfOccupies.Add(spot, occupies);
+            if (minimumReachableNeighbours < Int32.MaxValue)
+            {
+                IEnumerable<Spot> nextSpots = nextSpotsNumberOfReachableNeighbours
+                    .Where(d => d.Value == minimumReachableNeighbours).Select(d => d.Key);
 
-            //    if (occupies > maximumNotWalkable)
-            //    {
-            //        maximumNotWalkable = occupies;
-            //    }
-            //}
+                Directions movmentDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
 
-            //if (maximumNotWalkable > Int32.MinValue)
-            //{
-            //    IEnumerable<Spot> nextSpot = nextSpotNumberOfOccupies.Where(d => d.Value == maximumNotWalkable).Select(d => d.Key);
-            //    LastDirection = Player.Direction(nextSpot.RandomOne());
-            //}
+                if(!Player.PossibleDirections.Contains(movmentDirection)){
+                    throw new InvalidOperationException("Gracz nie może się przsunąć?");
+                }
 
-            //return LastDirection;
+                LastDirection = movmentDirection;
+            }
+
+            return LastDirection;
         }
     }
 }

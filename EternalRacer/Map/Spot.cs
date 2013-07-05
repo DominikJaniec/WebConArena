@@ -10,6 +10,8 @@ namespace EternalRacer.Map
     /// </summary>
     public class Spot : ISearchNodeProvider
     {
+        private World MyWorld;
+
         /// <summary>
         /// Spot Coordinate in World.
         /// </summary>
@@ -21,9 +23,16 @@ namespace EternalRacer.Map
         public SpotStates State { get; set; }
 
         /// <summary>
-        /// List of nearest neighbourhood as SpotDirection.
+        /// List of nearest neighbour Spot.
         /// </summary>
-        public List<SpotDirection> Neighbourhood { get; private set; }
+        public HashSet<Spot> Neighbourhood { get; private set; }
+        //public List<Spot> Neighbourhood { get; private set; }
+        /// <summary>
+        /// List of possible movment as Directions
+        /// </summary>
+        public HashSet<Directions> PossibleDirections { get; private set; }
+        //public List<Directions> PossibleDirections { get; private set; }
+
         /// <summary>
         /// Graph node as ISearchNodeProvider for Graph algorithms.
         /// </summary>
@@ -38,6 +47,7 @@ namespace EternalRacer.Map
         public Spot(int x, int y)
         {
             Coord = new Map.Coordinate(x, y);
+            GraphNode = new SearchNode();
         }
 
         /// <summary>
@@ -45,55 +55,105 @@ namespace EternalRacer.Map
         /// </summary>
         /// <param name="worldMap">World maps with Spots</param>
         /// <param name="spotState">Initialize SpotStates</param>
+        /// <exception cref="ArgumentNullException"/>
         /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         public void InitializeInWorld(World worldMap, SpotStates spotState = SpotStates.Free)
         {
-            Neighbourhood = new List<SpotDirection>(4);
-            GraphNode = new SearchNode();
-            State = spotState;
+            if (worldMap == null)
+            {
+                throw new ArgumentNullException("worldMap");
+            }
+            MyWorld = worldMap;
 
-            if (!worldMap.IsInsideWorld(Coord))
+            if (!MyWorld.IsInsideWorld(Coord))
             {
                 throw new InvalidOperationException("Current Spot is outside of the worldMap");
             }
 
+            Neighbourhood = new HashSet<Spot>();
+            //Neighbourhood = new List<Spot>(4);
+            PossibleDirections = new HashSet<Directions>();
+            //PossibleDirections = new List<Directions>(4);
+
             // Northern neighbour:
-            AddNeighbourIfInsideWolrd(Coord.X, Coord.Y - 1, worldMap);
+            AddNeighbourIfInsideWolrd(Coord.X, Coord.Y - 1);
 
             // Eastern neighbour:
-            AddNeighbourIfInsideWolrd(Coord.X + 1, Coord.Y, worldMap);
+            AddNeighbourIfInsideWolrd(Coord.X + 1, Coord.Y);
 
             // Southern neighbour:
-            AddNeighbourIfInsideWolrd(Coord.X, Coord.Y + 1, worldMap);
+            AddNeighbourIfInsideWolrd(Coord.X, Coord.Y + 1);
 
             // Western neighbour:
-            AddNeighbourIfInsideWolrd(Coord.X - 1, Coord.Y, worldMap);
+            AddNeighbourIfInsideWolrd(Coord.X - 1, Coord.Y);
+
+            switch (spotState)
+            {
+                case SpotStates.Free:
+                    SetMeFree();
+                    break;
+                case SpotStates.Occupy:
+                    SetMyOccupy();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("spotState", spotState, "Unknown spot state.");
+            }
         }
 
-        private void AddNeighbourIfInsideWolrd(int nX, int nY, World worldMap)
+        private void AddNeighbourIfInsideWolrd(int nX, int nY)
         {
             Coordinate neighbourCoord = new Coordinate(nX, nY);
 
-            if (worldMap.IsInsideWorld(neighbourCoord))
+            if (MyWorld.IsInsideWorld(neighbourCoord))
             {
-                Neighbourhood.Add(new SpotDirection(this, worldMap[neighbourCoord]));
+                Neighbourhood.Add(MyWorld[neighbourCoord]);
             }
         }
 
 
         /// <summary>
-        /// Retrive all possible Directions.
+        /// Set State to SpotStates.Free, and establishes possible directions, in this and Neighbourhood.
         /// </summary>
-        public IEnumerable<Directions> RetrivePossibleDirections
+        public void SetMeFree()
         {
-            get { return Neighbourhood.Select(sd => sd.Direction); }
+            foreach (Spot neighbour in Neighbourhood)
+            {
+                Directions directionFromHim = neighbour.DirectionToNeighbour(this);
+                neighbour.PossibleDirections.Add(directionFromHim);
+
+                Directions directionFromMe = DirectionToNeighbour(neighbour);
+                PossibleDirections.Add(directionFromMe);
+            }
+
+            State = SpotStates.Free;
         }
+
+        /// <summary>
+        /// Set State to SpotStates.Occupy, and closes possible directions, in this and Neighbourhood.
+        /// </summary>
+        public void SetMyOccupy()
+        {
+            State = SpotStates.Occupy;
+
+            foreach (Directions direction in PossibleDirections)
+            {
+                Spot neighbour = NeighbourInDirection(direction);
+                Directions directionFromHim = neighbour.DirectionToNeighbour(this);
+
+                neighbour.PossibleDirections.Remove(directionFromHim);
+            }
+
+            PossibleDirections.Clear();
+        }
+
+
         /// <summary>
         /// Retrive all available neighbours.
         /// </summary>
-        public IEnumerable<Spot> RetriveAvailableNeighbours
+        public IEnumerable<Spot> RetriveReachableNeighbours
         {
-            get { return Neighbourhood.Select(sd => sd.ToThat); }
+            get { return Neighbourhood.Where(neighbour => PossibleDirections.Contains(DirectionToNeighbour(neighbour))); }
         }
 
 
@@ -121,52 +181,52 @@ namespace EternalRacer.Map
         }
 
         /// <summary>
-        /// Fix linear Directions.
-        /// From this Spot to toThat Spot.
+        /// designated Directions. From this Spot to neighbour.
         /// </summary>
-        /// <param name="toThat">Goal Spot</param>
-        /// <returns>Integer number of Manhattan distance</returns>
+        /// <param name="neighbour">Goal neighbour</param>
+        /// <returns>Directions value</returns>
         /// <exception cref="ArgumentNullException"/>
-        public Directions Direction(Spot toThat)
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        public Directions DirectionToNeighbour(Spot neighbour)
         {
-            if (toThat == null)
+            if (neighbour == null)
             {
-                throw new ArgumentNullException("toThat");
+                throw new ArgumentNullException("neighbour");
             }
 
-            int dx = toThat.Coord.X - Coord.X;
-            int dy = toThat.Coord.Y - Coord.Y;
+            int dx = neighbour.Coord.X - Coord.X;
+            int dy = neighbour.Coord.Y - Coord.Y;
 
-            if (dx == 0 && dy < 0)
+            if (dx == 0 && dy == -1)
             {
                 return Directions.North;
             }
-            else if (dx > 0 && dy == 0)
+            else if (dx == 1 && dy == 0)
             {
                 return Directions.East;
             }
-            else if (dx == 0 && dy > 0)
+            else if (dx == 0 && dy == 1)
             {
                 return Directions.South;
             }
-            else if (dx < 0 && dy == 0)
+            else if (dx == -1 && dy == 0)
             {
                 return Directions.West;
             }
             else
             {
-                throw new ArgumentOutOfRangeException("toThat", toThat, "It is in an unknown direction.");
+                throw new ArgumentOutOfRangeException("neighbour", neighbour, "It is in an unknown direction.");
             }
         }
 
         /// <summary>
-        /// Get available neighbour in Directions.
+        /// Get Neighbour in specific directions.
         /// </summary>
-        /// <param name="direction">Directions to neighbour</param>
-        /// <returns></returns>
-        public Spot InDirection(Directions direction)
+        /// <param name="direction">Directions from this to neighbour</param>
+        /// <returns>Neighbour Spot</returns>
+        public Spot NeighbourInDirection(Directions direction)
         {
-            return Neighbourhood.SingleOrDefault(sd => sd.Direction == direction).ToThat;
+            return Neighbourhood.Single(s => DirectionToNeighbour(s) == direction);
         }
 
 
