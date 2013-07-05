@@ -12,44 +12,42 @@ namespace EternalRacer.Strategies
             get { return Strategies.Survival; }
         }
 
-        public Directions LastDirection { get; private set; }
-
         public StrategySurvival(AStrategy lastStrategy)
             : base(lastStrategy) { }
 
         protected override Directions ComputeNextMovment()
         {
-            Dictionary<Spot, int> nextSpotsNumberOfReachableNeighbours = new Dictionary<Spot, int>(3);
             int minimumReachableNeighbours = Int32.MaxValue;
+            Dictionary<Spot, int> nextSpotNumberOfReachableNeighbours;
+            nextSpotNumberOfReachableNeighbours = new Dictionary<Spot, int>(3);
 
-            foreach (Spot spot in Player.RetriveReachableNeighbours)
+            foreach (Spot nextSpot in Player.RetriveReachableNeighbours)
             {
-                int reachableNeighbours = spot.PossibleDirections.Count();
-                //--reachableNeighbours; // Becouse, We can not go back...
+                int nextReachableNeighbours = nextSpot.PossibleDirections.Count();
 
-                nextSpotsNumberOfReachableNeighbours.Add(spot, reachableNeighbours);
+                // Becouse, We can not go back...
+                --nextReachableNeighbours;
 
-                if (reachableNeighbours < minimumReachableNeighbours)
+                nextSpotNumberOfReachableNeighbours.Add(nextSpot, nextReachableNeighbours);
+
+                if (nextReachableNeighbours < minimumReachableNeighbours)
                 {
-                    minimumReachableNeighbours = reachableNeighbours;
+                    minimumReachableNeighbours = nextReachableNeighbours;
                 }
             }
 
-            if (minimumReachableNeighbours < Int32.MaxValue)
+            IEnumerable<Spot> nextSpots = nextSpotNumberOfReachableNeighbours
+                .Where(d => d.Value == minimumReachableNeighbours).Select(d => d.Key);
+
+            Directions nextDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
+
+            //TODO: Posprzatac kiedy bedzie działać
+            if (!Player.PossibleDirections.Contains(nextDirection))
             {
-                IEnumerable<Spot> nextSpots = nextSpotsNumberOfReachableNeighbours
-                    .Where(d => d.Value == minimumReachableNeighbours).Select(d => d.Key);
-
-                Directions movmentDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
-
-                if(!Player.PossibleDirections.Contains(movmentDirection)){
-                    throw new InvalidOperationException("Gracz nie może się przsunąć?");
-                }
-
-                LastDirection = movmentDirection;
+                throw new InvalidOperationException("Gracz nie może się przsunąć?");
             }
 
-            return LastDirection;
+            return nextDirection;
         }
     }
 }

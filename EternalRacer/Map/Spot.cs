@@ -12,6 +12,17 @@ namespace EternalRacer.Map
     {
         private World MyWorld;
 
+        private void AddNeighbourIfInsideWolrd(int nX, int nY)
+        {
+            Coordinate neighbourCoord = new Coordinate(nX, nY);
+
+            if (MyWorld.IsInsideWorld(neighbourCoord))
+            {
+                Neighbourhood.Add(MyWorld[neighbourCoord]);
+            }
+        }
+
+
         /// <summary>
         /// Spot Coordinate in World.
         /// </summary>
@@ -20,7 +31,7 @@ namespace EternalRacer.Map
         /// <summary>
         /// Spot state as SpotStates.
         /// </summary>
-        public SpotStates State { get; set; }
+        public SpotStates State { get; private set; }
 
         /// <summary>
         /// List of nearest neighbour Spot.
@@ -39,42 +50,46 @@ namespace EternalRacer.Map
         public SearchNode GraphNode { get; private set; }
 
 
+
         /// <summary>
-        /// Spot constructor, sets the read-only Coordinates.
+        /// Spot constructor, sets the read-only Coordinates in world.
         /// </summary>
         /// <param name="x">X Coordinate</param>
         /// <param name="y">Y Coordinate</param>
-        public Spot(int x, int y)
-        {
-            Coord = new Map.Coordinate(x, y);
-            GraphNode = new SearchNode();
-        }
-
-        /// <summary>
-        /// Initialize Spot's World context. Required for work.
-        /// </summary>
         /// <param name="worldMap">World maps with Spots</param>
-        /// <param name="spotState">Initialize SpotStates</param>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="InvalidOperationException"/>
-        /// <exception cref="ArgumentOutOfRangeException"/>
-        public void InitializeInWorld(World worldMap, SpotStates spotState = SpotStates.Free)
+        public Spot(int x, int y, World worldMap)
         {
             if (worldMap == null)
             {
                 throw new ArgumentNullException("worldMap");
             }
-            MyWorld = worldMap;
 
-            if (!MyWorld.IsInsideWorld(Coord))
+            MyWorld = worldMap;
+            Coord = new Coordinate(x, y);
+
+            if (!worldMap.IsInsideWorld(Coord))
             {
                 throw new InvalidOperationException("Current Spot is outside of the worldMap");
             }
+
+            GraphNode = new SearchNode();
 
             Neighbourhood = new HashSet<Spot>();
             //Neighbourhood = new List<Spot>(4);
             PossibleDirections = new HashSet<Directions>();
             //PossibleDirections = new List<Directions>(4);
+        }
+
+        /// <summary>
+        /// Initialize Spot's World context.
+        /// 1'st. required for work.
+        /// </summary>
+        public void InitializeInWorld()
+        {
+            Neighbourhood.Clear();
+            PossibleDirections.Clear();
 
             // Northern neighbour:
             AddNeighbourIfInsideWolrd(Coord.X, Coord.Y - 1);
@@ -87,7 +102,16 @@ namespace EternalRacer.Map
 
             // Western neighbour:
             AddNeighbourIfInsideWolrd(Coord.X - 1, Coord.Y);
+        }
 
+        /// <summary>
+        /// Initialize Spot's World State.
+        /// 2'nd. required for work.
+        /// </summary>
+        /// <param name="spotState">Initialize SpotStates</param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        public void InitializeStateInWorld(SpotStates spotState)
+        {
             switch (spotState)
             {
                 case SpotStates.Free:
@@ -101,15 +125,6 @@ namespace EternalRacer.Map
             }
         }
 
-        private void AddNeighbourIfInsideWolrd(int nX, int nY)
-        {
-            Coordinate neighbourCoord = new Coordinate(nX, nY);
-
-            if (MyWorld.IsInsideWorld(neighbourCoord))
-            {
-                Neighbourhood.Add(MyWorld[neighbourCoord]);
-            }
-        }
 
 
         /// <summary>
@@ -148,6 +163,7 @@ namespace EternalRacer.Map
         }
 
 
+
         /// <summary>
         /// Retrive all available neighbours.
         /// </summary>
@@ -155,7 +171,6 @@ namespace EternalRacer.Map
         {
             get { return Neighbourhood.Where(neighbour => PossibleDirections.Contains(DirectionToNeighbour(neighbour))); }
         }
-
 
         /// <summary>
         /// Number of steps in Taxicab geometry.
@@ -228,6 +243,7 @@ namespace EternalRacer.Map
         {
             return Neighbourhood.Single(s => DirectionToNeighbour(s) == direction);
         }
+
 
 
         /// <summary>

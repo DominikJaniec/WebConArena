@@ -11,17 +11,17 @@ namespace EternalRacer.Strategies
         public Spot Player { get; private set; }
         public Spot Enemy { get; private set; }
 
+        public Directions PlayerLastDirection { get; private set; }
+
         public abstract Strategies Kind { get; }
 
         #endregion
 
         #region Constructors
 
-        public AStrategy(World map, Coordinate player, Coordinate enemy)
+        public AStrategy(World map)
         {
             Map = map;
-            Player = map[player];
-            Enemy = map[enemy];
         }
 
         public AStrategy(AStrategy lastStrategy)
@@ -29,6 +29,8 @@ namespace EternalRacer.Strategies
             Map = lastStrategy.Map;
             Player = lastStrategy.Player;
             Enemy = lastStrategy.Enemy;
+
+            PlayerLastDirection = lastStrategy.PlayerLastDirection;
         }
 
         #endregion
@@ -37,13 +39,18 @@ namespace EternalRacer.Strategies
 
         public Directions NextMove(Coordinate playerNow, Coordinate enemyNow)
         {
-            Map[playerNow].State = SpotStates.Occupy;
             Player = Map[playerNow];
-
-            Map[enemyNow].State = SpotStates.Occupy;
             Enemy = Map[enemyNow];
 
-            return ComputeNextMovment();
+            if (Player.PossibleDirections.Count > 0)
+            {
+                PlayerLastDirection = ComputeNextMovment();
+            }
+
+            Player.SetMyOccupy();
+            Enemy.SetMyOccupy();
+
+            return PlayerLastDirection;
         }
 
         protected abstract Directions ComputeNextMovment();
@@ -53,7 +60,7 @@ namespace EternalRacer.Strategies
         #region Override ToString
         public override string ToString()
         {
-            return String.Format("{0} - Player: {1} | Enemy: {2}", Kind, Player.Coord, Enemy.Coord);
+            return String.Format("{0} - Player: {1}, Enemy: {2}", Kind, Player.Coord, Enemy.Coord);
         }
         #endregion
     }

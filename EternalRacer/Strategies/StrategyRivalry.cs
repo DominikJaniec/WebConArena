@@ -10,8 +10,8 @@ namespace EternalRacer.Strategies
             get { return Strategies.Rivalry; }
         }
 
-        public StrategyRivalry(World map, Coordinate player, Coordinate enemy)
-            : base(map, player, enemy) { }
+        public StrategyRivalry(World map)
+            : base(map) { }
 
         protected override Directions ComputeNextMovment()
         {

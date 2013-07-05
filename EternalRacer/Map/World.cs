@@ -40,10 +40,6 @@ namespace EternalRacer.Map
             for (int x = 0; x < Properties.Width; ++x)
             {
                 WorldMap[x] = new Spot[Properties.Height];
-                for (int y = 0; y < Properties.Height; ++y)
-                {
-                    WorldMap[x][y] = new Spot(x, y);
-                }
             }
         }
 
@@ -58,7 +54,24 @@ namespace EternalRacer.Map
             {
                 for (int y = 0; y < Properties.Height; ++y)
                 {
-                    WorldMap[x][y].InitializeInWorld(this, worldState);
+                    WorldMap[x][y] = new Spot(x, y, this);
+                }
+            }
+
+
+            for (int x = 0; x < Properties.Width; ++x)
+            {
+                for (int y = 0; y < Properties.Height; ++y)
+                {
+                    WorldMap[x][y].InitializeInWorld();
+                }
+            }
+
+            for (int x = 0; x < Properties.Width; ++x)
+            {
+                for (int y = 0; y < Properties.Height; ++y)
+                {
+                    WorldMap[x][y].InitializeStateInWorld(worldState);
                 }
             }
         }
