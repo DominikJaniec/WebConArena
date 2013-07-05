@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EternalRacer.GameMap
 {
@@ -29,7 +31,7 @@ namespace EternalRacer.GameMap
 
         #endregion
 
-        #region Checking functions
+        #region Public function
 
         public bool IsInsideWorld(Spot point)
         {
@@ -65,6 +67,18 @@ namespace EternalRacer.GameMap
             {
                 return false;
             }
+        }
+
+        public IEnumerable<Spot> NearestWalkableNeighbourhood(Spot fromThat)
+        {
+            IEnumerable<Spot> oneStepNeighbourhood = fromThat.NeighbourhoodNearest.Where(spot => fromThat.StepsTo(spot) == 1);
+            IEnumerable<Spot> walkable = oneStepNeighbourhood.Where(spot => IsWalkable(spot));
+
+            return walkable;
+
+            //return fromThat.NeighbourhoodNearest
+            //    .Where(spot => fromThat.StepsTo(spot) == 1)
+            //    .Where(spot => IsWalkable(spot));
         }
 
         #endregion

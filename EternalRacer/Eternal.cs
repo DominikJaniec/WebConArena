@@ -8,7 +8,7 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.2.3",
+        Version = "0.0.2.4",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
@@ -52,6 +52,12 @@ namespace EternalRacer
         {
             WorldGameMap = PrepareMap(mapPointList);
             GameStrategy = new StrategyRivalry(WorldGameMap, myStartPosition.ToSpot(), opponentStartPosition.ToSpot());
+
+
+            //TODO 1: Implementacja strategi przetrwania.
+            // Z tego powodu tylko strategi przetrwania:
+            GameStrategy = new StrategySurvival(GameStrategy);
+
 
             GetMoveFuns = InGameGetMove;
             return GetMoveFuns(myStartPosition, opponentStartPosition, mapPointList);

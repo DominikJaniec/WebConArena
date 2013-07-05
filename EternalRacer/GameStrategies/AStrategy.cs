@@ -53,7 +53,7 @@ namespace EternalRacer.GameStrategies
         #region Override ToString
         public override string ToString()
         {
-            return String.Format("{0} - Player: {0} | Enemy: {1}", Kind, Player, Enemy);
+            return String.Format("{0} - Player: {1} | Enemy: {2}", Kind, Player, Enemy);
         }
         #endregion
     }

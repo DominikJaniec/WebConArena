@@ -22,6 +22,22 @@ namespace EternalRacer.GameMap
 
         #endregion
 
+        /// <summary>
+        /// Number of steps in Taxicab geometry.
+        /// </summary>
+        /// <param name="toThat">Goal Spot</param>
+        /// <returns>Integer of Manhattan distance</returns>
+        public int StepsTo(Spot toThat)
+        {
+            int dx = X - toThat.X;
+            dx = (dx < 0) ? (-1) * dx : dx;
+
+            int dy = Y - toThat.Y;
+            dy = (dy < 0) ? (-1) * dy : dy;
+
+            return (dx + dy);
+        }
+
         #region Neighbourhood
 
         public List<Spot> NeighbourhoodNearest
@@ -62,10 +78,10 @@ namespace EternalRacer.GameMap
 
         #region Directions
 
-        public Directions DirectionFromThis(Spot toThat)
+        public Directions Direction(Spot toThat)
         {
-            int dx = this.X - toThat.X;
-            int dy = this.Y - toThat.Y;
+            int dx = toThat.X - this.X;
+            int dy = toThat.Y - this.Y;
 
             if (dx == 0 && dy == -1)
             {

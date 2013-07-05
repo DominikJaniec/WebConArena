@@ -57,6 +57,7 @@
     <Compile Include="GameStrategies\StrategyRivalry.cs" />
     <Compile Include="GameStrategies\Strategies.cs" />
     <Compile Include="GameStrategies\StrategySurvival.cs" />
+    <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="Pathfinding\AStarPathfinder.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />
     <Compile Include="PriorityQueue\IPriorityItem.cs" />
