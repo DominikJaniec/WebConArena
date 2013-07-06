@@ -5,7 +5,23 @@
     /// </summary>
     public enum SpotStates
     {
-        Occupy,
-        Free
+        /// <summary>
+        /// Not reachable Spot.
+        /// </summary>
+        Occupied,
+        /// <summary>
+        /// Available Spot.
+        /// </summary>
+        Free,
+        /// <summary>
+        /// Spot for Player.
+        /// Neighbourhood are available. Neighbours can not reach Spot.
+        /// </summary>
+        OccupyIncoming,
+        /// <summary>
+        /// Spot for Enemy.
+        /// Can not reach Neighbourhood. Spot is available for Neighbours
+        /// </summary>
+        OccupyOutgoing
     }
 }

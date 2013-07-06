@@ -8,9 +8,9 @@ namespace EternalRacer.Map
     /// <summary>
     /// Represent a spot node in World.
     /// </summary>
-    public class Spot : ISearchNodeProvider
+    public class Spot
     {
-        private World MyWorld;
+        protected World MyWorld;
 
         private void AddNeighbourIfInsideWolrd(int nX, int nY)
         {
@@ -36,19 +36,11 @@ namespace EternalRacer.Map
         /// <summary>
         /// List of nearest neighbour Spot.
         /// </summary>
-        public HashSet<Spot> Neighbourhood { get; private set; }
-        //public List<Spot> Neighbourhood { get; private set; }
+        public List<Spot> Neighbourhood { get; private set; }
         /// <summary>
         /// List of possible movment as Directions
         /// </summary>
-        public HashSet<Directions> PossibleDirections { get; private set; }
-        //public List<Directions> PossibleDirections { get; private set; }
-
-        /// <summary>
-        /// Graph node as ISearchNodeProvider for Graph algorithms.
-        /// </summary>
-        public SearchNode GraphNode { get; private set; }
-
+        public List<Directions> AvailableDirections { get; private set; }
 
 
         /// <summary>
@@ -74,12 +66,8 @@ namespace EternalRacer.Map
                 throw new InvalidOperationException("Current Spot is outside of the worldMap");
             }
 
-            GraphNode = new SearchNode();
-
-            Neighbourhood = new HashSet<Spot>();
-            //Neighbourhood = new List<Spot>(4);
-            PossibleDirections = new HashSet<Directions>();
-            //PossibleDirections = new List<Directions>(4);
+            Neighbourhood = new List<Spot>(4);
+            AvailableDirections = new List<Directions>(4);
         }
 
         /// <summary>
@@ -89,7 +77,7 @@ namespace EternalRacer.Map
         public void InitializeInWorld()
         {
             Neighbourhood.Clear();
-            PossibleDirections.Clear();
+            AvailableDirections.Clear();
 
             // Northern neighbour:
             AddNeighbourIfInsideWolrd(Coord.X, Coord.Y - 1);
@@ -117,8 +105,8 @@ namespace EternalRacer.Map
                 case SpotStates.Free:
                     SetMeFree();
                     break;
-                case SpotStates.Occupy:
-                    SetMyOccupy();
+                case SpotStates.Occupied:
+                    SetMyOccupied();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("spotState", spotState, "Unknown spot state.");
@@ -132,34 +120,102 @@ namespace EternalRacer.Map
         /// </summary>
         public void SetMeFree()
         {
+            AvailableDirections.Clear();
+
             foreach (Spot neighbour in Neighbourhood)
             {
-                Directions directionFromHim = neighbour.DirectionToNeighbour(this);
-                neighbour.PossibleDirections.Add(directionFromHim);
-
-                Directions directionFromMe = DirectionToNeighbour(neighbour);
-                PossibleDirections.Add(directionFromMe);
+                if (neighbour.State == SpotStates.Free)
+                {
+                    neighbour.DirectionAdd(this);
+                    DirectionAdd(neighbour);
+                }
             }
 
             State = SpotStates.Free;
         }
 
         /// <summary>
-        /// Set State to SpotStates.Occupy, and closes possible directions, in this and Neighbourhood.
+        /// Set State to SpotStates.Occupied, and closes possible directions, in this and Neighbourhood.
         /// </summary>
-        public void SetMyOccupy()
+        public virtual void SetMyOccupied()
         {
-            State = SpotStates.Occupy;
+            State = SpotStates.Occupied;
 
-            foreach (Directions direction in PossibleDirections)
+            foreach (Spot neighbour in Neighbourhood)
             {
-                Spot neighbour = NeighbourInDirection(direction);
-                Directions directionFromHim = neighbour.DirectionToNeighbour(this);
-
-                neighbour.PossibleDirections.Remove(directionFromHim);
+                if (neighbour.State != SpotStates.Occupied)
+                {
+                    neighbour.DirectionRemove(this);
+                }
             }
 
-            PossibleDirections.Clear();
+            AvailableDirections.Clear();
+        }
+
+        /// <summary>
+        /// Set State to SpotStates.OccupyIncoming or SpotStates.OccupyOutgoing, and closes matching directions.
+        /// </summary>
+        /// <param name="spotState">Can by only: OccupyIncoming or OccupyOutgoing</param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        public virtual void OccupyMeAs(SpotStates spotState)
+        {
+            switch (spotState)
+            {
+                case SpotStates.OccupyIncoming:
+                    State = SpotStates.OccupyIncoming;
+                    foreach (Spot neighbour in Neighbourhood)
+                    {
+                        if (neighbour.State != SpotStates.Occupied)
+                        {
+                            neighbour.DirectionRemove(this);
+                        }
+                    }
+                    break;
+                case SpotStates.OccupyOutgoing:
+                    State = SpotStates.OccupyOutgoing;
+                    AvailableDirections.Clear();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("spotState", spotState, "Can by only: SpotStates.OccupyIncoming or SpotStates.OccupyOutgoing");
+            }
+        }
+
+
+        /// <summary>
+        /// Remove Direction from AvailableDirections.
+        /// From this Spot to toThat Spot.
+        /// </summary>
+        /// <param name="toThat">Goal Spot</param>
+        /// <exception cref="ArgumentNullException"/>
+        public void DirectionRemove(Spot toThat)
+        {
+            if (toThat == null)
+            {
+                throw new ArgumentNullException("toThat");
+            }
+
+            Directions direcction = DirectionToNeighbour(toThat);
+            AvailableDirections.Remove(direcction);
+        }
+
+        /// <summary>
+        /// Add Direction to AvailableDirections.
+        /// From this Spot to toThat Spot.
+        /// </summary>
+        /// <param name="toThat">Goal Spot</param>
+        /// <exception cref="ArgumentNullException"/>
+        public void DirectionAdd(Spot toThat)
+        {
+            if (toThat == null)
+            {
+                throw new ArgumentNullException("toThat");
+            }
+
+            Directions direcction = DirectionToNeighbour(toThat);
+            if (!AvailableDirections.Contains(direcction))
+            {
+                AvailableDirections.Add(direcction);
+            }
         }
 
 
@@ -169,7 +225,7 @@ namespace EternalRacer.Map
         /// </summary>
         public IEnumerable<Spot> RetriveReachableNeighbours
         {
-            get { return Neighbourhood.Where(neighbour => PossibleDirections.Contains(DirectionToNeighbour(neighbour))); }
+            get { return Neighbourhood.Where(neighbour => AvailableDirections.Contains(DirectionToNeighbour(neighbour))); }
         }
 
         /// <summary>

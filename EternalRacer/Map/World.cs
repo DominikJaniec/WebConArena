@@ -1,13 +1,15 @@
-﻿using System;
+﻿using EternalRacer.Graph;
+using System;
+using System.Collections.Generic;
 
 namespace EternalRacer.Map
 {
     /// <summary>
     /// Represent a map of the wolrd.
     /// </summary>
-    public class World
+    public class World : IGraph<VertexSpot>
     {
-        private readonly Spot[][] WorldMap;
+        private readonly VertexSpot[][] WorldMap;
 
 
         /// <summary>
@@ -20,10 +22,10 @@ namespace EternalRacer.Map
         /// </summary>
         /// <param name="coord">Spot's Coordinate</param>
         /// <returns>Spot on given coordinate</returns>
-        public Spot this[Coordinate coord]
+        public VertexSpot this[Coordinate coord]
         {
-            get { return WorldMap[coord.X][coord.Y]; }
-            set { WorldMap[coord.X][coord.Y] = value; }
+            get { return WorldMap[coord.X - Properties.XMin][coord.Y - Properties.YMin]; }
+            set { WorldMap[coord.X - Properties.XMin][coord.Y - Properties.YMin] = value; }
         }
 
 
@@ -35,11 +37,13 @@ namespace EternalRacer.Map
         public World(Properties properties)
         {
             Properties = properties;
+            Algorithms = new GraphAlgorithms<World, VertexSpot>(this);
+            
 
-            WorldMap = new Spot[Properties.Width][];
+            WorldMap = new VertexSpot[Properties.Width][];
             for (int x = 0; x < Properties.Width; ++x)
             {
-                WorldMap[x] = new Spot[Properties.Height];
+                WorldMap[x] = new VertexSpot[Properties.Height];
             }
         }
 
@@ -54,7 +58,7 @@ namespace EternalRacer.Map
             {
                 for (int y = 0; y < Properties.Height; ++y)
                 {
-                    WorldMap[x][y] = new Spot(x, y, this);
+                    WorldMap[x][y] = new VertexSpot(x, y, this);
                 }
             }
 
@@ -102,6 +106,28 @@ namespace EternalRacer.Map
         public override string ToString()
         {
             return String.Format("WorldMap - {0}", Properties);
+        }
+
+        /// <summary>
+        /// Graph Algorithms instance
+        /// </summary>
+        public GraphAlgorithms<World, VertexSpot> Algorithms { get; private set; }
+
+        /// <summary>
+        /// Enumerator for IGraph
+        /// </summary>
+        /// <returns>VertexEnumerator</returns>
+        public IEnumerable<VertexSpot> GetVertices()
+        {
+            for (int x = 0; x < Properties.Width; ++x)
+            {
+                for (int y = 0; y < Properties.Height; ++y)
+                {
+                    yield return WorldMap[x][y];
+                }
+            }
+
+            yield break;
         }
     }
 }

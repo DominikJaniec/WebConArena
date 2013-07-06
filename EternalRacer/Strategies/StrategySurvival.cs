@@ -1,4 +1,5 @@
-﻿using EternalRacer.Map;
+﻿using EternalRacer.Graph;
+using EternalRacer.Map;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace EternalRacer.Strategies
 
             foreach (Spot nextSpot in Player.RetriveReachableNeighbours)
             {
-                int nextReachableNeighbours = nextSpot.PossibleDirections.Count();
+                int nextReachableNeighbours = nextSpot.AvailableDirections.Count();
 
                 // Becouse, We can not go back...
                 --nextReachableNeighbours;
@@ -42,7 +43,7 @@ namespace EternalRacer.Strategies
             Directions nextDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
 
             //TODO: Posprzatac kiedy bedzie działać
-            if (!Player.PossibleDirections.Contains(nextDirection))
+            if (!Player.AvailableDirections.Contains(nextDirection))
             {
                 throw new InvalidOperationException("Gracz nie może się przsunąć?");
             }

@@ -42,13 +42,13 @@ namespace EternalRacer.Strategies
             Player = Map[playerNow];
             Enemy = Map[enemyNow];
 
-            if (Player.PossibleDirections.Count > 0)
+            if (Player.AvailableDirections.Count > 0)
             {
                 PlayerLastDirection = ComputeNextMovment();
             }
 
-            Player.SetMyOccupy();
-            Enemy.SetMyOccupy();
+            Player.SetMyOccupied();
+            Enemy.SetMyOccupied();
 
             return PlayerLastDirection;
         }

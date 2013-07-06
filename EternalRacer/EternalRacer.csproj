@@ -47,18 +47,21 @@
   <ItemGroup>
     <Compile Include="Eternal.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Graph\GraphAlgorithms.cs" />
+    <Compile Include="Graph\IGraph.cs" />
+    <Compile Include="Graph\NodeSearching.cs" />
     <Compile Include="Map\Coordinate.cs" />
     <Compile Include="Map\Directions.cs" />
     <Compile Include="Map\Spot.cs" />
     <Compile Include="Map\SpotStates.cs" />
+    <Compile Include="Map\VertexSpot.cs" />
     <Compile Include="Map\World.cs" />
     <Compile Include="Map\Properties.cs" />
     <Compile Include="Strategies\AStrategy.cs" />
     <Compile Include="Strategies\StrategyRivalry.cs" />
     <Compile Include="Strategies\Strategies.cs" />
     <Compile Include="Strategies\StrategySurvival.cs" />
-    <Compile Include="Graph\ISearchNodeProvider.cs" />
-    <Compile Include="Graph\SearchNode.cs" />
+    <Compile Include="Graph\IVertex.cs" />
     <Compile Include="Graph\SearchState.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="Pathfinding\AStarPathfinder.cs" />
