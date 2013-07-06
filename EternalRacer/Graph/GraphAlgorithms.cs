@@ -1,8 +1,8 @@
-﻿using EternalRacer.PriorityQueue;
-using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using EternalRacer.Graph.Nodes;
 using EternalRacer.Map;
+using EternalRacer.PriorityQueue;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EternalRacer.Graph
 {
@@ -18,8 +18,8 @@ namespace EternalRacer.Graph
             DfsLeafs = new List<TVertex>();
 
             //TODO: Coś porazić na ten rozmiar:
-            AxClosedSet = new HashSet<NodePathing>();
-            AxOpenQueue = new PriorityQueue<double, NodePathing>(1801);
+            AxClosedSet = new HashSet<Path>();
+            AxOpenQueue = new PriorityQueue<double, Path>(1801);
         }
 
 
@@ -27,7 +27,7 @@ namespace EternalRacer.Graph
         {
             foreach (TVertex vertex in Graph.GetVertices())
             {
-                vertex.SearchingNode.Clear();
+                vertex.Searching.Clear();
             }
 
             DfsTimer = 0;
@@ -45,7 +45,7 @@ namespace EternalRacer.Graph
 
         public List<Directions> FindPath(TVertex fromThis, TVertex toThat)
         {
-            NodePathing goal = AxCalculatePath(fromThis, toThat);
+            Path goal = AxCalculatePath(fromThis, toThat);
             return (goal != null) ? RetriveDirectionsByPath(goal) : new List<Directions>(0);
         }
 
@@ -58,22 +58,22 @@ namespace EternalRacer.Graph
         {
             bool hasUnexploredChildren = false;
 
-            vertex.SearchingNode.State = SearchState.Discovered;
-            vertex.SearchingNode.TimeDiscovered = ++DfsTimer;
+            vertex.Searching.State = SearchState.Discovered;
+            vertex.Searching.TimeDiscovered = ++DfsTimer;
 
             foreach (TVertex child in vertex.Edges)
             {
-                if (child.SearchingNode.State == SearchState.Unexplored)
+                if (child.Searching.State == SearchState.Unexplored)
                 {
-                    child.SearchingNode.Ancestor = vertex;
+                    child.Searching.Ancestor = vertex;
                     hasUnexploredChildren = true;
 
                     DfsVisit(child);
                 }
             }
 
-            vertex.SearchingNode.State = SearchState.Explored;
-            vertex.SearchingNode.TimeExplored = ++DfsTimer;
+            vertex.Searching.State = SearchState.Explored;
+            vertex.Searching.TimeExplored = ++DfsTimer;
 
             if (!hasUnexploredChildren)
             {
@@ -85,22 +85,23 @@ namespace EternalRacer.Graph
 
         #region A* implementation
 
-        private PriorityQueue<double, NodePathing> AxOpenQueue;
-        private HashSet<NodePathing> AxClosedSet;
+        private PriorityQueue<double, Path> AxOpenQueue;
+        private HashSet<Path> AxClosedSet;
 
-        private NodePathing AxCalculatePath(TVertex from, TVertex toThat)
+        private Path AxCalculatePath(TVertex from, TVertex toThat)
         {
             AxOpenQueue.Clear();
             AxClosedSet.Clear();
 
-            NodePathing goalNode = toThat.PathingNode;
+            Path goalNode = toThat.Pathing;
 
-            from.PathingNode.ClearAndSet(from.DistanceTo(toThat));
-            AxOpenQueue.Insert(from.PathingNode);
+            from.Pathing.Clear();
+            from.Pathing.H = from.DistanceTo(toThat);
+            AxOpenQueue.Insert(from.Pathing);
 
             while (!AxOpenQueue.IsEmpty)
             {
-                NodePathing current = AxOpenQueue.PullHighest();
+                Path current = AxOpenQueue.PullHighest();
                 if (current.Equals(goalNode))
                 {
                     return current;
@@ -108,20 +109,21 @@ namespace EternalRacer.Graph
 
                 AxClosedSet.Add(current);
 
-                foreach (NodePathing successor in current.Current.Edges.Select(iv => iv.PathingNode))
+                foreach (Path successor in current.Owner.Edges.Select(iv => iv.Pathing))
                 {
                     if (!AxClosedSet.Contains(successor))
                     {
-                        successor.ClearAndSet(current.Current.DistanceTo(goalNode.Current));
+                        successor.Clear();
+                        successor.H = current.Owner.DistanceTo(goalNode.Owner);
 
                         if (!AxOpenQueue.Contains(successor))
                         {
-                            successor.Ancestor = current.Current;
+                            successor.Ancestor = current.Owner;
                             AxOpenQueue.Insert(successor);
                         }
                         else if (successor.G > current.G + current.MovmentCost)
                         {
-                            successor.Ancestor = current.Current;
+                            successor.Ancestor = current.Owner;
                             AxOpenQueue.ItemPriorityChanged(successor);
                         }
                     }
@@ -131,15 +133,15 @@ namespace EternalRacer.Graph
             return null;
         }
 
-        private List<Directions> RetriveDirectionsByPath(NodePathing goal)
+        private List<Directions> RetriveDirectionsByPath(Path goal)
         {
             List<Directions> movmentsList = new List<Directions>();
-            NodePathing current = goal;
+            Path current = goal;
 
             while (current.Ancestor != null)
             {
-                movmentsList.Add(current.Current.DirectionTo(current.Ancestor));
-                current = current.Ancestor.PathingNode;
+                movmentsList.Add(current.Owner.DirectionTo(current.Ancestor));
+                current = current.Ancestor.Pathing;
             }
 
             return movmentsList;

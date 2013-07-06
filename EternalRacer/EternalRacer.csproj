@@ -47,10 +47,12 @@
   <ItemGroup>
     <Compile Include="Eternal.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Graph\ANode.cs" />
     <Compile Include="Graph\GraphAlgorithms.cs" />
     <Compile Include="Graph\IGraph.cs" />
-    <Compile Include="Graph\NodeSearching.cs" />
-    <Compile Include="Graph\NodePathing.cs" />
+    <Compile Include="Graph\Nodes\Path.cs" />
+    <Compile Include="Graph\Nodes\Search.cs" />
+    <Compile Include="Graph\Nodes\Voronoi.cs" />
     <Compile Include="Map\Coordinate.cs" />
     <Compile Include="Map\Directions.cs" />
     <Compile Include="Map\Spot.cs" />

@@ -1,4 +1,5 @@
 ﻿using EternalRacer.Graph;
+using EternalRacer.Graph.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,9 @@ namespace EternalRacer.Map
     {
         public bool IsArticulationPoint { get; private set; }
 
-        public NodeSearching SearchingNode { get; private set; }
-        public NodePathing PathingNode { get; private set; }
+        public Search Searching { get; private set; }
+        public Path Pathing { get; private set; }
+        public Voronoi Voronoing { get; private set; }
 
         public IEnumerable<IVertex> Edges
         {
@@ -20,8 +22,9 @@ namespace EternalRacer.Map
         public VertexSpot(int x, int y, World worldMap)
             : base(x, y, worldMap)
         {
-            SearchingNode = new NodeSearching();
-            PathingNode = new NodePathing(this);
+            Searching = new Search(this);
+            Pathing = new Path(this);
+            Voronoing = new Voronoi(this);
 
             IsArticulationPoint = false;
         }
