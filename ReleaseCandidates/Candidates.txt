@@ -1,0 +1,4 @@
+Release Candidates:
+
+    * EternalRacer.0.0.2.15.dll
+        - Podstawowe poruszanie siê po planszy i zape³nianie przestrzeni w sposób znoœny. Stara poruszaæ siê przy œcianach.
