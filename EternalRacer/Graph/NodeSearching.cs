@@ -2,17 +2,24 @@
 {
     public class NodeSearching
     {
-        public SearchState State { get; set; }
         public IVertex Ancestor { get; set; }
+        public SearchState State { get; set; }
 
         public int TimeDiscovered { get; set; }
         public int TimeExplored { get; set; }
 
-        public void Reset()
+        public NodeSearching()
+        {
+            Clear();
+        }
+
+        public void Clear()
         {
             Ancestor = null;
             State = SearchState.Unexplored;
-            TimeDiscovered = TimeExplored = 0;
+
+            TimeDiscovered = 0;
+            TimeExplored = 0;
         }
     }
 }

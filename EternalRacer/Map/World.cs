@@ -38,7 +38,7 @@ namespace EternalRacer.Map
         {
             Properties = properties;
             Algorithms = new GraphAlgorithms<World, VertexSpot>(this);
-            
+
 
             WorldMap = new VertexSpot[Properties.Width][];
             for (int x = 0; x < Properties.Width; ++x)

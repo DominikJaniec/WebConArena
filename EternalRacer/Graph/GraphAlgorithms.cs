@@ -1,5 +1,8 @@
-﻿using System;
+﻿using EternalRacer.PriorityQueue;
+using System;
+using System.Linq;
 using System.Collections.Generic;
+using EternalRacer.Map;
 
 namespace EternalRacer.Graph
 {
@@ -13,16 +16,18 @@ namespace EternalRacer.Graph
         {
             Graph = graph;
             DfsLeafs = new List<TVertex>();
+
+            //TODO: Coś porazić na ten rozmiar:
+            AxClosedSet = new HashSet<NodePathing>();
+            AxOpenQueue = new PriorityQueue<double, NodePathing>(1801);
         }
 
-        private int DfsTimer;
-        private List<TVertex> DfsLeafs;
 
         public List<TVertex> DepthFirstSearch(TVertex rootNode)
         {
             foreach (TVertex vertex in Graph.GetVertices())
             {
-                vertex.SearchNode.Reset();
+                vertex.SearchingNode.Clear();
             }
 
             DfsTimer = 0;
@@ -33,26 +38,42 @@ namespace EternalRacer.Graph
             return DfsLeafs;
         }
 
+        public bool Connected(TVertex first, TVertex second)
+        {
+            return AxCalculatePath(first, second) != null;
+        }
+
+        public List<Directions> FindPath(TVertex fromThis, TVertex toThat)
+        {
+            NodePathing goal = AxCalculatePath(fromThis, toThat);
+            return (goal != null) ? RetriveDirectionsByPath(goal) : new List<Directions>(0);
+        }
+
+        #region Depth First Search Implementation
+
+        private int DfsTimer;
+        private List<TVertex> DfsLeafs;
+
         private void DfsVisit(TVertex vertex)
         {
             bool hasUnexploredChildren = false;
 
-            vertex.SearchNode.State = SearchState.Discovered;
-            vertex.SearchNode.TimeDiscovered = ++DfsTimer;
+            vertex.SearchingNode.State = SearchState.Discovered;
+            vertex.SearchingNode.TimeDiscovered = ++DfsTimer;
 
             foreach (TVertex child in vertex.Edges)
             {
-                if (child.SearchNode.State == SearchState.Unexplored)
+                if (child.SearchingNode.State == SearchState.Unexplored)
                 {
-                    child.SearchNode.Ancestor = vertex;
+                    child.SearchingNode.Ancestor = vertex;
                     hasUnexploredChildren = true;
 
                     DfsVisit(child);
                 }
             }
 
-            vertex.SearchNode.State = SearchState.Explored;
-            vertex.SearchNode.TimeExplored = ++DfsTimer;
+            vertex.SearchingNode.State = SearchState.Explored;
+            vertex.SearchingNode.TimeExplored = ++DfsTimer;
 
             if (!hasUnexploredChildren)
             {
@@ -60,9 +81,68 @@ namespace EternalRacer.Graph
             }
         }
 
-        internal bool Connected(TVertex vertexFirst, TVertex vertexSecond)
+        #endregion
+
+        #region A* implementation
+
+        private PriorityQueue<double, NodePathing> AxOpenQueue;
+        private HashSet<NodePathing> AxClosedSet;
+
+        private NodePathing AxCalculatePath(TVertex from, TVertex toThat)
         {
-            throw new NotImplementedException();
+            AxOpenQueue.Clear();
+            AxClosedSet.Clear();
+
+            NodePathing goalNode = toThat.PathingNode;
+
+            from.PathingNode.ClearAndSet(from.DistanceTo(toThat));
+            AxOpenQueue.Insert(from.PathingNode);
+
+            while (!AxOpenQueue.IsEmpty)
+            {
+                NodePathing current = AxOpenQueue.PullHighest();
+                if (current.Equals(goalNode))
+                {
+                    return current;
+                }
+
+                AxClosedSet.Add(current);
+
+                foreach (NodePathing successor in current.Current.Edges.Select(iv => iv.PathingNode))
+                {
+                    if (!AxClosedSet.Contains(successor))
+                    {
+                        if (!AxOpenQueue.Contains(successor))
+                        {
+                            successor.Ancestor = current.Current;
+                            AxOpenQueue.Insert(successor);
+                        }
+                        else if (successor.G > current.G + current.MovmentCost)
+                        {
+                            successor.Ancestor = current.Current;
+                            AxOpenQueue.ItemPriorityChanged(successor);
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
+
+        private List<Directions> RetriveDirectionsByPath(NodePathing goal)
+        {
+            List<Directions> movmentsList = new List<Directions>();
+            NodePathing current = goal;
+
+            while (current.Ancestor != null)
+            {
+                movmentsList.Add(current.Current.DirectionTo(current.Ancestor));
+                current = current.Ancestor.PathingNode;
+            }
+
+            return movmentsList;
+        }
+
+        #endregion
     }
 }

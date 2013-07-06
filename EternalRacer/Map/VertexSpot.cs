@@ -8,9 +8,11 @@ namespace EternalRacer.Map
     public class VertexSpot : Spot, IVertex
     {
         public bool IsArticulationPoint { get; private set; }
-        public NodeSearching SearchNode { get; private set; }
 
-        IEnumerable<IVertex> IVertex.Edges
+        public NodeSearching SearchingNode { get; private set; }
+        public NodePathing PathingNode { get; private set; }
+
+        public IEnumerable<IVertex> Edges
         {
             get { return RetriveReachableNeighbours.Cast<IVertex>(); }
         }
@@ -18,7 +20,9 @@ namespace EternalRacer.Map
         public VertexSpot(int x, int y, World worldMap)
             : base(x, y, worldMap)
         {
-            SearchNode = new NodeSearching();
+            SearchingNode = new NodeSearching();
+            PathingNode = new NodePathing(this);
+
             IsArticulationPoint = false;
         }
 
@@ -108,6 +112,16 @@ namespace EternalRacer.Map
             }
 
             return neighbourhood;
+        }
+
+        public double DistanceTo(IVertex toThat)
+        {
+            return base.StepsTo((Spot)toThat);
+        }
+
+        public Directions DirectionTo(IVertex toThat)
+        {
+            return base.DirectionToNeighbour((Spot)toThat);
         }
     }
 }

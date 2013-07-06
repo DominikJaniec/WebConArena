@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using EternalRacer.Map;
+using System.Collections.Generic;
 
 namespace EternalRacer.Graph
 {
@@ -9,6 +10,10 @@ namespace EternalRacer.Graph
         bool IsArticulationPoint { get; }
         void DetermineCutVertex();
 
-        NodeSearching SearchNode { get; }        
+        NodeSearching SearchingNode { get; }
+
+        NodePathing PathingNode { get; }
+        double DistanceTo(IVertex toThat);
+        Directions DirectionTo(IVertex toThat);
     }
 }
