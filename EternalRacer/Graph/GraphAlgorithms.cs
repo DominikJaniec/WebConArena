@@ -112,6 +112,8 @@ namespace EternalRacer.Graph
                 {
                     if (!AxClosedSet.Contains(successor))
                     {
+                        successor.ClearAndSet(current.Current.DistanceTo(goalNode.Current));
+
                         if (!AxOpenQueue.Contains(successor))
                         {
                             successor.Ancestor = current.Current;

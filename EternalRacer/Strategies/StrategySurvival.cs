@@ -1,5 +1,4 @@
-﻿using EternalRacer.Graph;
-using EternalRacer.Map;
+﻿using EternalRacer.Map;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +39,15 @@ namespace EternalRacer.Strategies
             IEnumerable<Spot> nextSpots = nextSpotNumberOfReachableNeighbours
                 .Where(d => d.Value == minimumReachableNeighbours).Select(d => d.Key);
 
-            Directions nextDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
+            //TODO: Posprzatac kiedy bedzie działać
+            VertexSpot next = (VertexSpot)nextSpots.RandomOne();
+            if (next.IsArticulationPoint)
+            {
+                throw new InvalidOperationException("Zaimplementowac unikanie punktów artykulacji");
+            }
+
+            //Directions nextDirection = Player.DirectionToNeighbour(nextSpots.RandomOne());
+            Directions nextDirection = Player.DirectionToNeighbour(next);
 
             //TODO: Posprzatac kiedy bedzie działać
             if (!Player.AvailableDirections.Contains(nextDirection))
