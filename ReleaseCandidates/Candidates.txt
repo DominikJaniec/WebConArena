@@ -2,3 +2,6 @@ Release Candidates:
 
     * EternalRacer.0.0.2.15.dll
         - Podstawowe poruszanie siê po planszy i zape³nianie przestrzeni w sposób znoœny. Stara poruszaæ siê przy œcianach.
+
+    * EternalRacer.0.0.3.13.dll
+        - To samo co wy¿ej... Jednak po zmianie hierarchii klas... Przez co siê nie wyrobi³em... Przynajmniej o 2 dni.
