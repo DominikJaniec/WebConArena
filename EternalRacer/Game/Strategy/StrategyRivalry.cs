@@ -1,7 +1,7 @@
-﻿using EternalRacer.Map;
+﻿using EternalRacer.Game.World;
 using System;
 
-namespace EternalRacer.Strategies
+namespace EternalRacer.Game.Strategy
 {
     public class StrategyRivalry : AStrategy
     {
@@ -10,10 +10,10 @@ namespace EternalRacer.Strategies
             get { return Strategies.Rivalry; }
         }
 
-        public StrategyRivalry(World map)
+        public StrategyRivalry(Universe map)
             : base(map) { }
 
-        protected override Directions ComputeNextMovment()
+        protected override Directions ComputeNextMovement()
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,4 @@
-﻿namespace EternalRacer.Graph
+﻿namespace EternalRacer.Graph.Algorithm.Nodes
 {
     public enum SearchState
     {

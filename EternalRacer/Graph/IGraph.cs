@@ -2,8 +2,12 @@
 
 namespace EternalRacer.Graph
 {
-    public interface IGraph<T> where T : IVertex
+    public interface IGraph<TVertexId, TEdgeWeight, TGraphImp, TVertexImp, TEdgeImp>
+        where TGraphImp : IGraph<TVertexId, TEdgeWeight, TGraphImp, TVertexImp, TEdgeImp>
+        where TVertexImp : IVertex<TVertexId, TEdgeWeight, TVertexImp, TEdgeImp>
+        where TEdgeImp : IVertexEdge<TVertexId, TEdgeWeight, TVertexImp, TEdgeImp>
     {
-        IEnumerable<T> GetVertices();
+        IEnumerable<TVertexImp> Vertices { get; }
+        bool IsValidId(TVertexId vertexId);
     }
 }

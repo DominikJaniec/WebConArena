@@ -1,4 +1,4 @@
-﻿using EternalRacer.Map;
+﻿using EternalRacer.Game.World;
 using System;
 using WebCon.Arena.Bots.AddIn;
 

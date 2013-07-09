@@ -1,5 +1,5 @@
-﻿using EternalRacer.Map;
-using EternalRacer.Strategies;
+﻿using EternalRacer.Game.Strategy;
+using EternalRacer.Game.World;
 using System;
 using System.AddIn;
 using System.Collections.Generic;
@@ -8,15 +8,14 @@ using WebCon.Arena.Bots.AddIn;
 namespace EternalRacer
 {
     [AddInAttribute("Eternal",
-        Version = "0.0.2.15",
+        Version = "0.0.3.13",
         Description = "Wieczny Jeździec",
         Publisher = "Dominik Janiec")]
     public class Eternal : IRacer
     {
         #region Public properties
 
-        public World WorldGameMap { get; private set; }
-
+        public Universe WorldGameMap { get; private set; }
         public AStrategy GameStrategy { get; private set; }
 
         #endregion
@@ -89,10 +88,10 @@ namespace EternalRacer
                 }
             });
 
-            Properties mapProperties = new Properties(minX, maxX, minY, maxY);
+            UniverseProperties mapProperties = new UniverseProperties(minX, maxX, minY, maxY);
 
-            WorldGameMap = new World(mapProperties);
-            WorldGameMap.InitializeWorld(SpotStates.Free);
+            WorldGameMap = new Universe(mapProperties);
+            WorldGameMap.InitializeUniverse();
         }
 
         #endregion

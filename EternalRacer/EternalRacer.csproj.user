@@ -5,4 +5,7 @@
     <StartProgram>E:\BitBucket\WebConArena\webcon_arena\arena.exe</StartProgram>
     <StartWorkingDirectory>E:\BitBucket\WebConArena\webcon_arena\</StartWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup>
+    <ProjectView>ProjectFiles</ProjectView>
+  </PropertyGroup>
 </Project>
